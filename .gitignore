@@ -1,0 +1,5 @@
+terrain
+logs
+sitl
+*.bin
+*.tlog*

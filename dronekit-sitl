@@ -13,11 +13,15 @@ target = 'linux'
 if sys.platform == 'darwin':
     target = 'osx'
 
+version = '3.4-dev'
+
+print 'os: %s, version: %s' % (target, version)
+
 if not os.path.isdir(self + '/sitl'):
     print "Downloading SITL."
     
     testfile = urllib.URLopener()
-    testfile.retrieve('http://dronekit-sitl-binaries.s3.amazonaws.com/copter/sitl-' + target + '-v3.4-dev.tar.gz', self + '/sitl.tar.gz')
+    testfile.retrieve('http://dronekit-sitl-binaries.s3.amazonaws.com/copter/sitl-' + target + '-v' + version + '.tar.gz', self + '/sitl.tar.gz')
 
     tar = tarfile.open(self + '/sitl.tar.gz')
     tar.extractall(path=self + '/sitl')

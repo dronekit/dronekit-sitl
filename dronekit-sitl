@@ -42,5 +42,5 @@ env = os.environ.copy()
 env['PYTHONUNBUFFERED'] = '1'
 
 p = Popen([self + '/sitl/ArduCopter.elf', '-S', '-I0', '--model', 'quad', '--home=-35.363261,149.165230,584,353'],
-          bufsize=1, env=env, universal_newlines=True)
+          bufsize=1, env=env, universal_newlines=True, cwd=self)
 p.communicate()

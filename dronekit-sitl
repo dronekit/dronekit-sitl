@@ -1,14 +1,19 @@
 #!/usr/bin/python
 
-import sys, os
-import subprocess, string, time
+import sys
+import os
+import subprocess
+import string
+import time
 import json
-import tarfile,sys
+import tarfile
+import sys
 import urllib
 import os
+from subprocess import Popen
 
 self = os.path.dirname(os.path.realpath(__file__))
- 
+
 target = 'linux'
 if sys.platform == 'darwin':
     target = 'osx'
@@ -19,9 +24,10 @@ print 'os: %s, version: %s' % (target, version)
 
 if not os.path.isdir(self + '/sitl'):
     print "Downloading SITL."
-    
+
     testfile = urllib.URLopener()
-    testfile.retrieve('http://dronekit-sitl-binaries.s3.amazonaws.com/copter/sitl-' + target + '-v' + version + '.tar.gz', self + '/sitl.tar.gz')
+    testfile.retrieve('http://dronekit-sitl-binaries.s3.amazonaws.com/copter/sitl-' +
+                      target + '-v' + version + '.tar.gz', self + '/sitl.tar.gz')
 
     tar = tarfile.open(self + '/sitl.tar.gz')
     tar.extractall(path=self + '/sitl')
@@ -35,5 +41,6 @@ else:
 env = os.environ.copy()
 env['PYTHONUNBUFFERED'] = '1'
 
-p = subprocess.Popen([self + '/sitl/ArduCopter.elf', '-S', '-I0', '--model', 'quad', '--home=-35.363261,149.165230,584,353'], bufsize=1, env=env, universal_newlines=True)
+p = Popen([self + '/sitl/ArduCopter.elf', '-S', '-I0', '--model', 'quad', '--home=-35.363261,149.165230,584,353'],
+          bufsize=1, env=env, universal_newlines=True)
 p.communicate()

@@ -22,12 +22,14 @@ version = '3.4-dev'
 
 print 'os: %s, version: %s' % (target, version)
 
+sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
+sitl_file = "{}/copter/sitl-{}-v{}.tar.gz".format(sitl_host, target, version)
+
 if not os.path.isdir(self + '/sitl'):
     print "Downloading SITL."
 
     testfile = urllib.URLopener()
-    testfile.retrieve('http://dronekit-sitl-binaries.s3.amazonaws.com/copter/sitl-' +
-                      target + '-v' + version + '.tar.gz', self + '/sitl.tar.gz')
+    testfile.retrieve(sitl_file, self + '/sitl.tar.gz')
 
     tar = tarfile.open(self + '/sitl.tar.gz')
     tar.extractall(path=self + '/sitl')

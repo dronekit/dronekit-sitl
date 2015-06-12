@@ -20,26 +20,31 @@ if sys.platform == 'darwin':
 
 version = '3.2.1'
 
+args = sys.argv[1:]
+if args[0] == '--version':
+    version = args[1]
+    args = args[2:]
+
 print 'os: %s, version: %s' % (target, version)
 
 sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
 sitl_file = "{}/copter/sitl-{}-v{}.tar.gz".format(sitl_host, target, version)
 
-if not os.path.isdir(self + '/sitl'):
-    print "Downloading SITL."
+if not os.path.isdir(self + '/sitl/' + version):
+    print "Downloading SITL..."
 
     testfile = urllib.URLopener()
     testfile.retrieve(sitl_file, self + '/sitl.tar.gz')
 
     tar = tarfile.open(self + '/sitl.tar.gz')
-    tar.extractall(path=self + '/sitl')
+    tar.extractall(path=self + '/sitl/' + version)
     tar.close()
 
     print 'Extracted.'
 else:
     print "SITL already Downloaded."
 
-args = [self + '/sitl/ArduCopter.elf'] + sys.argv[1:]
+args = [self + '/sitl/' + version + '/ArduCopter.elf'] + args
 print 'Execute: ' + str(args)
 
 p = Popen(args, cwd=self)

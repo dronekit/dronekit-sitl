@@ -4,3 +4,5 @@ sitl
 *.bin
 *.tlog*
 *.tar.gz
+*.egg*
+

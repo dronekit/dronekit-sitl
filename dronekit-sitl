@@ -18,7 +18,7 @@ target = 'linux'
 if sys.platform == 'darwin':
     target = 'osx'
 
-version = '3.4-dev'
+version = '3.2.1'
 
 print 'os: %s, version: %s' % (target, version)
 
@@ -43,6 +43,7 @@ else:
 env = os.environ.copy()
 env['PYTHONUNBUFFERED'] = '1'
 
-p = Popen([self + '/sitl/ArduCopter.elf', '-S', '-I0', '--model', 'quad', '--home=-35.363261,149.165230,584,353'],
+# TODO In >=3.3, add '-S', '--model', 'quad', '--home=-35.363261,149.165230,584,353'
+p = Popen([self + '/sitl/ArduCopter.elf', '-I0'],
           bufsize=1, env=env, universal_newlines=True, cwd=self)
 p.communicate()

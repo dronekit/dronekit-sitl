@@ -1,12 +1,12 @@
 # dronekit-sitl-runner
 
 ```
-git clone https://github.com/tcr3dr/dronekit-sitl-runner.git
-./dronekit-sitl-runner/dronekit-sitl
+pip install git+https://github.com/tcr3dr/dronekit-sitl-runner
 ```
 
-Then run mavproxy:
+Then:
 
 ```
+dronekit-sitl -I0 # -S --model quad --home=-35.363261,149.165230,584,353
 mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550 --out 127.0.0.1:14551
 ```

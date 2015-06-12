@@ -39,11 +39,8 @@ if not os.path.isdir(self + '/sitl'):
 else:
     print "SITL already Downloaded."
 
+args = [self + '/sitl/ArduCopter.elf'] + sys.argv[1:]
+print 'Execute: ' + str(args)
 
-env = os.environ.copy()
-env['PYTHONUNBUFFERED'] = '1'
-
-# TODO In >=3.3, add '-S', '--model', 'quad', '--home=-35.363261,149.165230,584,353'
-p = Popen([self + '/sitl/ArduCopter.elf', '-I0'],
-          bufsize=1, env=env, universal_newlines=True, cwd=self)
+p = Popen(args, cwd=self)
 p.communicate()

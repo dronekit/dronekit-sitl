@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+import re
 import sys
 import os
 import subprocess
@@ -21,17 +22,19 @@ if sys.platform == 'darwin':
 version = '3.2.1'
 
 args = sys.argv[1:]
-if args[0] == '--release':
-    version = args[1]
-    args = args[2:]
+if len(args) < 1 or not re.match(r'^copter(-v?.+)?', args[0]):
+    print 'Please specify one of <copter(-version)> to run sitl'
+    sys.exit(1)
+if re.match(r'^copter-v?(.+)', args[0]):
+    version = re.match(r'^copter-v?(.+)', args[0]).group(1)
 
-print 'os: %s, release: %s' % (target, version)
+print 'os: %s, apm: %s, release: %s' % (target, 'copter', version)
 
 sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
 sitl_file = "{}/copter/sitl-{}-v{}.tar.gz".format(sitl_host, target, version)
 
 if not os.path.isdir(self + '/sitl/' + version):
-    print "Downloading SITL..."
+    print "Downloading SITL from %s" % sitl_file
 
     testfile = urllib.URLopener()
     testfile.retrieve(sitl_file, self + '/sitl.tar.gz')

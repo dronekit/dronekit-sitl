@@ -1,5 +1,6 @@
 #!/usr/bin/python
 
+from __future__ import print_function
 import re
 import sys
 import os
@@ -10,10 +11,26 @@ import json
 import tarfile
 import sys
 import urllib
+import urllib2
 import os
+import json
 from subprocess import Popen
 
+sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
+sitl_list = '{}/versions.json'.format(sitl_host)
+
 self = os.path.dirname(os.path.realpath(__file__))
+
+args = sys.argv[1:]
+if len(args) > 0 and args[0] == 'list':
+    req = urllib2.Request(sitl_list, headers={'Accept':'*/*'})
+    raw = urllib2.urlopen(req).read()
+    versions = json.loads(raw)
+    keys = [k for k, v in versions['copter'].iteritems()]
+    keys.sort()
+    for k in keys:
+        print(k)
+    sys.exit(0)
 
 target = 'linux'
 if sys.platform == 'darwin':
@@ -21,20 +38,20 @@ if sys.platform == 'darwin':
 
 version = '3.2.1'
 
-args = sys.argv[1:]
 if len(args) < 1 or not re.match(r'^copter(-v?.+)?', args[0]):
-    print 'Please specify one of <copter(-version)> to run sitl'
+    print('Please specify one of:', file=sys.stderr)
+    print('  dronekit-sitl list', file=sys.stderr)
+    print('  dronekit-sitl <copter(-version)>', file=sys.stderr)
     sys.exit(1)
 if re.match(r'^copter-v?(.+)', args[0]):
     version = re.match(r'^copter-v?(.+)', args[0]).group(1)
 
-print 'os: %s, apm: %s, release: %s' % (target, 'copter', version)
+print('os: %s, apm: %s, release: %s' % (target, 'copter', version))
 
-sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
 sitl_file = "{}/copter/sitl-{}-v{}.tar.gz".format(sitl_host, target, version)
 
 if not os.path.isdir(self + '/sitl/' + version):
-    print "Downloading SITL from %s" % sitl_file
+    print("Downloading SITL from %s" % sitl_file)
 
     testfile = urllib.URLopener()
     testfile.retrieve(sitl_file, self + '/sitl.tar.gz')
@@ -43,12 +60,12 @@ if not os.path.isdir(self + '/sitl/' + version):
     tar.extractall(path=self + '/sitl/' + version)
     tar.close()
 
-    print 'Extracted.'
+    print('Extracted.')
 else:
-    print "SITL already Downloaded."
+    print("SITL already Downloaded.")
 
 args = [self + '/sitl/' + version + '/ArduCopter.elf'] + args
-print 'Execute: ' + str(args)
+print('Execute:', str(args))
 
 p = Popen(args, cwd=self)
 p.communicate()

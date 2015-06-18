@@ -9,4 +9,5 @@ setup(name='Dronekit SITL Runner',
       author_email='tim@3drobotics.com',
       url='https://github.com/tcr3dr/dronekit-sitl-runner/',
       scripts=['dronekit-sitl'],
+      packages=['dronekit_sitl_runner'],
       )

@@ -4,7 +4,7 @@ from __future__ import print_function
 import re
 import sys
 import os
-from __init__ import *
+from dronekit_sitl_runner import *
 
 system = 'copter'
 target = detect_target()

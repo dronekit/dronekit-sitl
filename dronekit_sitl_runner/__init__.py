@@ -28,7 +28,7 @@ def version_list():
     versions = json.loads(raw)
     return versions
 
-def download_sitl(system, version, target):
+def download(system, version, target):
     sitl_file = "{}/{}/sitl-{}-v{}.tar.gz".format(sitl_host, system, target, version)
 
     if not os.path.isdir(self + '/sitl/' + system + '-' + version):

@@ -5,4 +5,4 @@ sitl
 *.tlog*
 *.tar.gz
 *.egg*
-
+*.pyc

@@ -35,5 +35,5 @@ args = args[1:]
 
 print('os: %s, apm: %s, release: %s' % (target, system, version))
 
-download_sitl(system, target, version)
+download_sitl(system, version, target)
 launch(system, version, args)

@@ -35,7 +35,8 @@ def download(system, version, target):
     if not os.path.isdir(sitl_target + '/' + system + '-' + version):
         print("Downloading SITL from %s" % sitl_file)
 
-        os.makedirs(sitl_target)
+        if not os.path.isdir(sitl_target):
+            os.makedirs(sitl_target)
 
         testfile = urllib.URLopener()
         testfile.retrieve(sitl_file, sitl_target + '/sitl.tar.gz')

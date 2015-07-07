@@ -1,0 +1,21 @@
+builds:
+  - os: windows
+    stages:
+      setup:
+        - python setup.py install
+      build:
+        - ./dronekit-sitl
+
+  - os: linux
+    stages:
+      setup:
+        - python setup.py install
+      build:
+        - ./dronekit-sitl
+
+  - os: osx
+    stages:
+      setup:
+        - python setup.py install
+      build:
+        - ./dronekit-sitl

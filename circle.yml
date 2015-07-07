@@ -1,0 +1,14 @@
+machine:
+  environment: {}
+dependencies:
+  override:
+    - ./dronekit-sitl:
+        environment: {}
+  pre:
+    - python setup.py install:
+        environment: {}
+test:
+  override:
+    - 'true'
+general:
+  build_dir: .

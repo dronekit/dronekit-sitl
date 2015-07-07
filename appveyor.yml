@@ -1,0 +1,14 @@
+environment:
+  global: {}
+init: []
+install:
+  - cmd: 'setlocal & python setup.py install & endlocal'
+build_script:
+  - cmd: 'setlocal & ./dronekit-sitl & endlocal'
+clone_depth: 10
+cache:
+  - '%CYG_CACHE%'
+test: 'off'
+branches:
+  only:
+    - master

@@ -24,7 +24,7 @@ sitl_target = expanduser('~/.dronekit/sitl')
 def version_list():
     sitl_list = '{}/versions.json'.format(sitl_host)
 
-    req = urllib2.Request(sitl_list, headers={'Accept':'*/*'})
+    req = urllib2.Request(sitl_list, headers={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'})
     raw = urllib2.urlopen(req).read()
     versions = json.loads(raw)
     return versions
@@ -50,7 +50,11 @@ def download(system, version, target):
         print("SITL already Downloaded.")
 
 def launch(system, version, args):
-    args = ['./' + system + '-' + version + '/ArduCopter.elf'] + args
+    elfname = {
+        "copter": "ArduCopter.elf",
+        "plane": "ArduPlane.elf",
+    }
+    args = ['./' + system + '-' + version + '/' + elfname[system]] + args
     print('Execute:', str(args))
 
     p = Popen(args, cwd=sitl_target)

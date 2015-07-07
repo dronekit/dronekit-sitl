@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='Dronekit SITL Runner',
-      version='1.2.0',
+      version='1.3.0',
       description='',
       author='Tim Ryan',
       author_email='tim@3drobotics.com',

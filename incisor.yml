@@ -4,18 +4,18 @@ builds:
       setup:
         - python setup.py install
       build:
-        - ./dronekit-sitl
+        - python dronekit-sitl --list
 
   - os: linux
     stages:
       setup:
         - python setup.py install
       build:
-        - ./dronekit-sitl
+        - ./dronekit-sitl --list
 
   - os: osx
     stages:
       setup:
-        - python setup.py install
+        - sudo python setup.py install
       build:
-        - ./dronekit-sitl
+        - ./dronekit-sitl --list

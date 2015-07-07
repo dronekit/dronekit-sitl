@@ -2,7 +2,7 @@ machine:
   environment: {}
 dependencies:
   override:
-    - ./dronekit-sitl:
+    - ./dronekit-sitl --list:
         environment: {}
   pre:
     - python setup.py install:

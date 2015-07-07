@@ -4,7 +4,7 @@ init: []
 install:
   - cmd: 'setlocal & python setup.py install & endlocal'
 build_script:
-  - cmd: 'setlocal & ./dronekit-sitl & endlocal'
+  - cmd: 'setlocal & python dronekit-sitl --list & endlocal'
 clone_depth: 10
 cache:
   - '%CYG_CACHE%'

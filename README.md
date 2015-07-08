@@ -1,7 +1,13 @@
 # dronekit-sitl-runner
 
+<code>Windows: [![Build status](https://ci.appveyor.com/api/projects/status/github/3drobotics/dronekit-sitl-runner?branch=master&svg=true)](https://ci.appveyor.com/project/3drobotics/dronekit-sitl-runner/branch/master)</code><br>
+<code>OS X:&nbsp;&nbsp;&nbsp; [![Build Status](https://travis-ci.org/3drobotics/dronekit-sitl-runner.svg?branch=master)](https://travis-ci.org/3drobotics/dronekit-sitl-runner)</code><br>
+<code>Linux:&nbsp;&nbsp; [![Build Status](https://circleci.com/gh/3drobotics/dronekit-sitl-runner.svg?style=shield)](https://circleci.com/gh/3drobotics/dronekit-sitl-runner)</code>
+
+Install from Github:
+
 ```
-pip install git+https://github.com/tcr3dr/dronekit-sitl-runner
+pip install git+https://github.com/3drobotics/dronekit-sitl-runner
 ```
 
 Then run one of:

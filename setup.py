@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-from distutils.core import setup
+from setuptools import setup
 
 setup(name='Dronekit SITL Runner',
       version='1.3.0',
@@ -8,6 +8,10 @@ setup(name='Dronekit SITL Runner',
       author='Tim Ryan',
       author_email='tim@3drobotics.com',
       url='https://github.com/tcr3dr/dronekit-sitl-runner/',
-      scripts=['dronekit-sitl'],
+      entry_points={
+          'console_scripts': [
+              'dronekit-sitl = dronekit_sitl_runner.__init__:main'
+          ]
+      },
       packages=['dronekit_sitl_runner'],
       )

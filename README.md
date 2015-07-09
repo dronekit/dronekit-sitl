@@ -7,7 +7,7 @@
 Install from Github:
 
 ```
-pip install git+https://github.com/3drobotics/dronekit-sitl-runner
+pip2 install git+https://github.com/3drobotics/dronekit-sitl-runner
 ```
 
 ## Usage

@@ -23,18 +23,20 @@ List of available commands:
 
 The ``--list`` commmand is used to display the available build versions (e.g. `copter-3.4-dev`).
 
-The optional ``parameter`` values are listed below.
+The ``-h`` *parameter* can be passed in the command above to list all the parameters to the build 
+(these are reproduced below).
 
 | Option | Description |
 |------|----|
-| --home HOME | set home location (lat,lng,alt,yaw) |
-| --model MODEL | set simulation model |
-| --wipe | wipe eeprom and dataflash |
-| --rate RATE | set SITL framerate |
-| --console | use console instead of TCP ports |
-| --instance N | set instance of SITL (adds 10*instance to all port numbers) |
-| --speedup SPEEDUP | set simulation speedup |
-| --gimbal | enable simulated MAVLink gimbal |
+| --h | Help (display help for the build - i.e. these parameters) |
+| --home HOME | Set home location (lat,lng,alt,yaw) |
+| --model MODEL | Set simulation model |
+| --wipe | Wipe eeprom and dataflash |
+| --rate RATE | Set SITL framerate |
+| --console | Use console instead of TCP ports |
+| --instance N | Set instance of SITL (adds 10*instance to all port numbers) |
+| --speedup SPEEDUP | Set simulation speedup |
+| --gimbal | Enable simulated MAVLink gimbal |
 | --autotest-dir | DIR set directory for additional files |
 
 

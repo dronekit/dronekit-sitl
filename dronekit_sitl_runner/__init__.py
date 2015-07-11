@@ -54,11 +54,17 @@ def launch(system, version, args):
         "copter": "ArduCopter.elf",
         "plane": "ArduPlane.elf",
     }
-    args = ['./' + system + '-' + version + '/' + elfname[system]] + args
+    args = [os.path.join(system + '-' + version, elfname[system])] + args
     print('Execute:', str(args))
 
-    p = Popen(args, cwd=sitl_target)
+    Popen(['dir', 'copter-3.3-rc5'], shell=True, cwd=sitl_target).communicate()
+    Popen(['echo', '%cd%'], shell=True, cwd=sitl_target).communicate()
+
+    p = Popen(args, cwd=sitl_target, shell=True)
     p.communicate()
+
+    if p.returncode != 0:
+        sys.exit(p.returncode)
 
 def detect_target():
     if sys.platform == 'darwin':
@@ -69,7 +75,10 @@ def detect_target():
 
 def reset():
     # delete local sitl installations
-    shutil.rmtree(sitl_target + '/')
+    try:
+        shutil.rmtree(sitl_target + '/')
+    except:
+        pass
     print('SITL directory cleared.')
 
 def main():

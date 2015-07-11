@@ -63,7 +63,7 @@ def launch(system, version, args):
 def detect_target():
     if sys.platform == 'darwin':
         return 'osx'
-    if sys.platform == 'windows':
+    if sys.platform == 'win32':
         return 'win'
     return 'linux'
 

@@ -57,9 +57,6 @@ def launch(system, version, args):
     args = [os.path.join(system + '-' + version, elfname[system])] + args
     print('Execute:', str(args))
 
-    Popen(['dir', 'copter-3.3-rc5'], shell=True, cwd=sitl_target).communicate()
-    Popen(['echo', '%cd%'], shell=True, cwd=sitl_target).communicate()
-
     p = Popen(args, cwd=sitl_target, shell=True)
     p.communicate()
 

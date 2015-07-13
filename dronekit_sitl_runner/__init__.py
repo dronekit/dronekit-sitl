@@ -54,10 +54,10 @@ def launch(system, version, args):
         "copter": "ArduCopter.elf",
         "plane": "ArduPlane.elf",
     }
-    args = [os.path.join(system + '-' + version, elfname[system])] + args
+    args = [os.path.join('.', elfname[system])] + args
     print('Execute:', str(args))
 
-    p = Popen(args, cwd=sitl_target, shell=True)
+    p = Popen(args, cwd=os.path.join(sitl_target, system + '-' + version))
     p.communicate()
 
     if p.returncode != 0:

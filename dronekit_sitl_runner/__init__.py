@@ -57,7 +57,7 @@ def launch(system, version, args):
     args = [os.path.join('.', elfname[system])] + args
     print('Execute:', str(args))
 
-    p = Popen(args, cwd=os.path.join(sitl_target, system + '-' + version))
+    p = Popen(args, cwd=os.path.join(sitl_target, system + '-' + version), shell=sys.platform == 'win32')
     p.communicate()
 
     if p.returncode != 0:

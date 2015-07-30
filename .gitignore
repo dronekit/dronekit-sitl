@@ -6,3 +6,4 @@ sitl
 *.tar.gz
 *.egg*
 *.pyc
+build

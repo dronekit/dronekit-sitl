@@ -74,7 +74,7 @@ SITL exposes a Python API for managing a SITL instance.
 from dronekit.sitl import SITL
 sitl = SITL(system, version) # launch system (e.g. "copter") and version (e.g. "3.3")
 sitl.download(target, verbose=False) # explicitly download version
-sitl.launch(args, verbose=False, auto_download=True, auto_block_until_ready=False)
+sitl.launch(args, verbose=False, auto_download=True, await_ready=False)
 sitl.block_until_ready(verbose=False) # explicitly wait until receiving commands
 code = sitl.complete(verbose=False) # wait until exit
 sitl.poll() # returns None or return code

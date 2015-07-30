@@ -10,7 +10,7 @@ setup(name='dronekit_sitl',
       url='https://github.com/tcr3dr/dronekit-sitl-runner/',
       entry_points={
           'console_scripts': [
-              'dronekit-sitl = dronekit.sitl.__init__:main'
+              'dronekit-sitl = dronekit.sitl.__main__'
           ]
       },
       packages = ['dronekit', 'dronekit.sitl'],

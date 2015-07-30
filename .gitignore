@@ -1,6 +1,5 @@
 terrain
 logs
-sitl
 *.bin
 *.tlog*
 *.tar.gz

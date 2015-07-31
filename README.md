@@ -66,6 +66,22 @@ We are providing hosting for some pre-compiled Ardupilot Copter and Plane binari
 | Plane | <http://dronekit-sitl-binaries.s3-website-us-east-1.amazonaws.com/plane/> |
 
 
+## API
+
+SITL exposes a Python API for managing a SITL instance.
+
+```
+from dronekit.sitl import SITL
+sitl = SITL(system, version) # launch system (e.g. "copter") and version (e.g. "3.3")
+sitl.download(target, verbose=False) # explicitly download version
+sitl.launch(args, verbose=False, auto_download=True, await_ready=False, restart=False)
+sitl.block_until_ready(verbose=False) # explicitly wait until receiving commands
+code = sitl.complete(verbose=False) # wait until exit
+sitl.poll() # returns None or return code
+sitl.stop() # terminates SITL
+```
+
+
 ## License
 
 dronekit-sitl-runner is licensed as MIT/ASL2

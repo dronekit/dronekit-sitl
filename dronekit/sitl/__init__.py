@@ -17,6 +17,7 @@ import json
 import shutil
 import atexit
 import select
+import psutil
 from subprocess import Popen, PIPE
 from os.path import expanduser
 from threading import Thread
@@ -24,6 +25,18 @@ from Queue import Queue, Empty
 
 sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
 sitl_target = expanduser('~/.dronekit/sitl')
+
+def kill(proc_pid):
+    process = psutil.Process(proc_pid)
+    for proc in process.children(recursive=True):
+        try:
+            proc.kill()
+        except psutil.NoSuchProcess:
+            pass
+    try:
+        process.kill()
+    except psutil.NoSuchProcess:
+        pass
 
 class NonBlockingStreamReader:
     def __init__(self, stream):
@@ -134,7 +147,7 @@ class SITL():
 
         def cleanup():
             try:
-                p.kill()
+                kill(p.pid)
             except:
                 pass
         atexit.register(cleanup)
@@ -149,9 +162,9 @@ class SITL():
         return self.p.poll()
 
     def stop(self):
-        self.p.kill()
+        kill(self.p.pid)
         while self.p.poll() == None:
-            time.sleep(1/10)
+            time.sleep(1.0/10.0)
 
     def block_until_ready(self, verbose=False):
         # Block until "Waiting for connection . . ."

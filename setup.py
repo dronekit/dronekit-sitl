@@ -8,6 +8,7 @@ setup(name='dronekit_sitl',
       author='Tim Ryan',
       author_email='tim@3drobotics.com',
       url='https://github.com/tcr3dr/dronekit-sitl-runner/',
+      install_requires = ['psutil>=3.0'],
       entry_points={
           'console_scripts': [
               'dronekit-sitl = dronekit.sitl.__main__'

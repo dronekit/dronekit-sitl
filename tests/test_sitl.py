@@ -11,7 +11,6 @@ def test_sitl():
     assert_equals(sitl.poll(), None, 'SITL should still be running.')
     sitl.stop()
     assert sitl.poll() != None, 'SITL should stop running after kill.'
-    assert sitl.poll() != 0, 'SITL should have died with error code.'
 
     # Test "relaunch"
     sitl.launch(copter_args)

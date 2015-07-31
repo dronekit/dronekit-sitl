@@ -2,8 +2,8 @@ machine:
   environment: {}
 dependencies:
   pre:
-    - sudo python setup.py install
-    - sudo pip install nose
+    - python setup.py install
+    - pip install nose
   override:
     - cd / && dronekit-sitl --list
     - nosetests tests

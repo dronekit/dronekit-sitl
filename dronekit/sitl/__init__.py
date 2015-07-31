@@ -97,6 +97,7 @@ class SITL():
     def __init__(self, system, version):
         self.system = system
         self.version = version
+        self.p = None
 
     def download(self, target=None, verbose=False):
         if target == None:
@@ -104,7 +105,12 @@ class SITL():
 
         return download(self.system, self.version, target, verbose=verbose)
 
-    def launch(self, args, auto_download=True, verbose=False, await_ready=False):
+    def launch(self, args, auto_download=True, verbose=False, await_ready=False, restart=False):
+        if self.p and self.poll() == None:
+            if not restart:
+                raise ChildProcessError('SITL is already running, please use .stop() to kill it')
+            self.stop()
+
         if auto_download:
             self.download()
 

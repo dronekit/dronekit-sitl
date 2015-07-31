@@ -188,7 +188,6 @@ def reset():
     except:
         pass
     print('SITL directory cleared.')
-<<<<<<< HEAD
 
 def main(args=[]):
     system = 'copter'
@@ -240,5 +239,3 @@ def main(args=[]):
 
     if code != 0:
         sys.exit(code)
-=======
->>>>>>> b22b57d... Adds --help flag and missing files.

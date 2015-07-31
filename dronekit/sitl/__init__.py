@@ -129,17 +129,18 @@ class SITL():
         #     sitl = Popen(['start', '/affinity', '14', '/realtime', '/b', '/wait'] + sitl_args, shell=True, stdout=PIPE, stderr=PIPE)
         # else:
         #     sitl = Popen(sitl_args, stdout=PIPE, stderr=PIPE)
-        self.p = Popen(args, cwd=os.path.join(sitl_target, self.system + '-' + self.version), shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
-
-        self.stdout = NonBlockingStreamReader(self.p.stdout)
-        self.stderr = NonBlockingStreamReader(self.p.stderr)
+        p = Popen(args, cwd=os.path.join(sitl_target, self.system + '-' + self.version), shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
+        self.p = p
 
         def cleanup():
             try:
-                self.p.kill()
+                p.kill()
             except:
                 pass
         atexit.register(cleanup)
+
+        self.stdout = NonBlockingStreamReader(p.stdout)
+        self.stderr = NonBlockingStreamReader(p.stderr)
 
         if await_ready:
             self.block_until_ready(verbose=verbose)
@@ -150,7 +151,7 @@ class SITL():
     def stop(self):
         self.p.kill()
         while self.p.poll() == None:
-            time.sleep(.1)
+            time.sleep(1/10)
 
     def block_until_ready(self, verbose=False):
         # Block until "Waiting for connection . . ."

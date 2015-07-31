@@ -1,6 +1,6 @@
 # dronekit-sitl-runner
 
-[![Windows Build status](https://img.shields.io/appveyor/ci/tcr3dr/dronekit-sitl-runner.svg?label=windows)](https://ci.appveyor.com/project/tcr3dr/dronekit-sitl-runner/branch/master) [![OS X Build Status](https://img.shields.io/travis/3drobotics/dronekit-sitl-runner.svg?label=os%20x)](https://travis-ci.org/3drobotics/dronekit-sitl-runner) [![Linux Build Status](https://img.shields.io/circleci/project/3drobotics/dronekit-sitl-runner.svg?label=linux)](https://circleci.com/gh/3drobotics/dronekit-sitl-runner)
+[![Windows Build status](https://img.shields.io/appveyor/ci/3drobotics/dronekit-sitl.svg?label=windows)](https://ci.appveyor.com/project/3drobotics/dronekit-sitl/branch/master) [![OS X Build Status](https://img.shields.io/travis/dronekit/dronekit-sitl.svg?label=os%20x)](https://travis-ci.org/dronekit/dronekit-sitl) [![Linux Build Status](https://img.shields.io/circleci/project/dronekit/dronekit-sitl.svg?label=linux)](https://circleci.com/gh/dronekit/dronekit-sitl)
 
 ## Installing
 

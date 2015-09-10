@@ -118,7 +118,7 @@ class SITL():
 
         return download(self.system, self.version, target, verbose=verbose)
 
-    def launch(self, args, auto_download=True, verbose=False, await_ready=False, restart=False):
+    def launch(self, args, auto_download=True, verbose=False, await_ready=False, restart=False, local=False):
         if self.p and self.poll() == None:
             if not restart:
                 raise ChildProcessError('SITL is already running, please use .stop() to kill it')
@@ -131,7 +131,12 @@ class SITL():
             "copter": "ArduCopter.elf",
             "plane": "ArduPlane.elf",
         }
-        args = [os.path.join('.', elfname[self.system])] + args
+
+        if not local:
+            args = [os.path.join('.', elfname[self.system])] + args
+        else:
+            args = [os.path.join('.', args[0])] + args[1:]
+
         if verbose:
             print('Execute:', str(args))
 
@@ -142,7 +147,10 @@ class SITL():
         #     sitl = Popen(['start', '/affinity', '14', '/realtime', '/b', '/wait'] + sitl_args, shell=True, stdout=PIPE, stderr=PIPE)
         # else:
         #     sitl = Popen(sitl_args, stdout=PIPE, stderr=PIPE)
-        p = Popen(args, cwd=os.path.join(sitl_target, self.system + '-' + self.version), shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
+        if local:
+            p = Popen(args, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
+        else:
+            p = Popen(args, cwd=os.path.join(sitl_target, self.system + '-' + self.version), shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
         self.p = p
 
         def cleanup():
@@ -213,6 +221,7 @@ def main(args=[]):
     system = 'copter'
     target = detect_target()
     version = '3.2.1'
+    local = False
 
     if len(args) > 0 and args[0] == '--list':
         versions = version_list()
@@ -233,7 +242,10 @@ def main(args=[]):
         reset()
         sys.exit(0)
 
-    if len(args) < 1 or not re.match(r'^(copter|plane)(-v?.+)?', args[0]):
+    if len(args) > 0 and args[0] == '--local':
+        local = True
+
+    if len(args) < 1 or not re.match(r'^(copter|plane)(-v?.+)?', args[0]) and not local:
         print('Please specify one of:', file=sys.stderr)
         print('  dronekit-sitl --list', file=sys.stderr)
         print('  dronekit-sitl --reset', file=sys.stderr)
@@ -252,8 +264,9 @@ def main(args=[]):
     print('os: %s, apm: %s, release: %s' % (target, system, version))
 
     sitl = SITL(system, version)
-    sitl.download(target, verbose=True)
-    sitl.launch(args, verbose=True)
+    if not local:
+        sitl.download(target, verbose=True)
+    sitl.launch(args, verbose=True, local=local)
     # sitl.block_until_ready(verbose=True)
     code = sitl.complete(verbose=True)
 

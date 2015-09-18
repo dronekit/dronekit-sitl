@@ -11,10 +11,6 @@
     "3.3-rc11": {
       "stable": false,
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-copter-3.3-rc11.tar.gz"
-    },
-    "3.4-dev": {
-      "stable": false,
-      "source": "https://github.com/diydrones/ardupilot/archive/69e59b2d9920f5b6faded1e77c7ac832d0d04d96.tar.gz"
     }
   },
   "plane": {

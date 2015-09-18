@@ -24,7 +24,7 @@ from threading import Thread
 from Queue import Queue, Empty
 
 sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
-sitl_target = expanduser('~/.dronekit/sitl')
+sitl_target = os.path.normpath(expanduser('~/.dronekit/sitl'))
 
 def kill(proc_pid):
     process = psutil.Process(proc_pid)

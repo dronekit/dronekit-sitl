@@ -130,6 +130,7 @@ class SITL():
         elfname = {
             "copter": "ArduCopter.elf",
             "plane": "ArduPlane.elf",
+            "solo": "ArduCopter.elf",
         }
 
         if not local:
@@ -246,12 +247,13 @@ def main(args=[]):
     if len(args) > 0 and args[0] == '--local':
         local = True
 
-    if len(args) < 1 or not re.match(r'^(copter|plane)(-v?.+)?', args[0]) and not local:
+    if len(args) < 1 or not re.match(r'^(copter|plane|solo)(-v?.+)?', args[0]) and not local:
         print('Please specify one of:', file=sys.stderr)
         print('  dronekit-sitl --list', file=sys.stderr)
         print('  dronekit-sitl --reset', file=sys.stderr)
         print('  dronekit-sitl <copter(-version)>', file=sys.stderr)
         print('  dronekit-sitl <plane(-version)>', file=sys.stderr)
+        print('  dronekit-sitl <solo(-version)>', file=sys.stderr)
         sys.exit(1)
 
     if re.match(r'^copter-v?(.+)', args[0]):
@@ -260,6 +262,9 @@ def main(args=[]):
     if re.match(r'^plane-v?(.+)', args[0]):
         system = 'plane'
         version = re.match(r'^plane-v?(.+)', args[0]).group(1)
+    if re.match(r'^solo-v?(.+)', args[0]):
+        system = 'solo'
+        version = re.match(r'^solo-v?(.+)', args[0]).group(1)
     args = args[1:]
 
     print('os: %s, apm: %s, release: %s' % (target, system, version))

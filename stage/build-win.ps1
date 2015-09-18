@@ -1,3 +1,7 @@
+$TARGET_LABEL="copter"
+$TARGET_ARDU="ArduCopter"
+$TARGET_VERSION="3.3-rc5"
+
 $STARTDIR = $(get-location)
 $env:STARTDIR = $(get-location)
 
@@ -19,4 +23,4 @@ cd $STARTDIR
 echo "Building... in $(get-location)"
 c:\cygwin\bin\bash .\cygwin.sh
 
-aws s3 cp sitl.tar.gz s3://dronekit-sitl-binaries/copter/sitl-win-$(cat .\VERSION).tar.gz --acl public-read
+# aws s3 cp sitl.tar.gz s3://dronekit-sitl-binaries/$TARGET_LABEL/sitl-win-$TARGET_VERSION.tar.gz --acl public-read

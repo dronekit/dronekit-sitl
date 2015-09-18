@@ -147,6 +147,7 @@ class SITL():
         #     sitl = Popen(['start', '/affinity', '14', '/realtime', '/b', '/wait'] + sitl_args, shell=True, stdout=PIPE, stderr=PIPE)
         # else:
         #     sitl = Popen(sitl_args, stdout=PIPE, stderr=PIPE)
+
         if local:
             p = Popen(args, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
         else:

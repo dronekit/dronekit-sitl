@@ -13,6 +13,12 @@
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-copter-3.3-rc11.tar.gz"
     }
   },
+  "solo": {
+    "1.1.40": {
+      "stable": false,
+      "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-solo-1.1.40.tar.gz"
+    }
+  },
   "plane": {
     "3.3.0": {
       "stable": true,

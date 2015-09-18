@@ -130,7 +130,7 @@ class SITL():
         elfname = {
             "copter": "ArduCopter.elf",
             "plane": "ArduPlane.elf",
-            "rover": "APMRover2.elf",
+            "rover": "APMrover2.elf",
             "solo": "ArduCopter.elf",
         }
 

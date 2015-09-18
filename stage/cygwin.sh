@@ -4,7 +4,7 @@
 MAKEARGS=""
 TARARGS="-C c:/cygwin/bin/ cyggcc_s-1.dll cygstdc++-6.dll cygwin1.dll"
 OSID="win"
-AWSCMD="aws"
+AWSCMD="aws.cmd"
 
 TARGET_LABEL="$1"
 TARGET_ARDU="$2"
@@ -42,4 +42,5 @@ cp /tmp/$TARGET_ARDU.build/$TARGET_ARDU.elf . || true
 cd $STARTDIR
 tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/ardupilot/$TARGET_ARDU/ $TARGET_ARDU.elf $TARARGS
 
+pip install awscli
 $AWSCMD s3 cp build/sitl.tar.gz s3://dronekit-sitl-binaries/$TARGET_LABEL/sitl-$OSID-v$TARGET_VERSION.tar.gz --acl public-read

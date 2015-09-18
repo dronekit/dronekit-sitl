@@ -1,6 +1,10 @@
 #!/bin/bash
 
 # OSX specific
+# sudo easy_install pip
+# sudo pip install awscli
+# brew tap homebrew/versions
+# brew install gcc48 gawk
 alias gawk=gcc
 MAKEARGS="NATIVE_CXX=g++-4.8 NATIVE_CC=gcc-4.8 NATIVE_AS=gcc-4.8 NATIVE_LD=g++-4.8"
 TARARGS=""
@@ -43,4 +47,5 @@ cp /tmp/$TARGET_ARDU.build/$TARGET_ARDU.elf . || true
 cd $STARTDIR
 tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/ardupilot/$TARGET_ARDU/ $TARGET_ARDU.elf $TARARGS
 
+pip install awscli
 $AWSCMD s3 cp build/sitl.tar.gz s3://dronekit-sitl-binaries/$TARGET_LABEL/sitl-$OSID-v$TARGET_VERSION.tar.gz --acl public-read

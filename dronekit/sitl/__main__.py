@@ -22,6 +22,4 @@ if sys.platform == 'win32':
         else:
             i += 1
 
-print(sys.argv);
-
 main(sys.argv[1:])

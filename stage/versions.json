@@ -1,0 +1,22 @@
+{
+  "copter": { 
+    "3.2.1": {
+      "stable": true,
+      "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-copter-3.2.1.tar.gz"
+    },
+    "3.3-rc5": {
+      "stable": false,
+      "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-copter-3.3-rc5.tar.gz"
+    },
+    "3.3-rc11": {
+      "stable": false,
+      "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-copter-3.3-rc11.tar.gz"
+    }
+  },
+  "plane": {
+    "3.3.0": {
+      "stable": true,
+      "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-plane-3.3.0.tar.gz"
+    }
+  }
+}

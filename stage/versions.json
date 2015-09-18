@@ -15,7 +15,7 @@
   },
   "solo": {
     "1.1.40": {
-      "stable": false,
+      "stable": true,
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-solo-1.1.40.tar.gz"
     }
   },
@@ -23,6 +23,12 @@
     "3.3.0": {
       "stable": true,
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-plane-3.3.0.tar.gz"
+    }
+  },
+  "rover": {
+    "2.50": {
+      "stable": true,
+      "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-rover-2.50.tar.gz"
     }
   }
 }

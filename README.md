@@ -19,6 +19,7 @@ List of available commands:
   dronekit-sitl --reset
   dronekit-sitl <copter(-version)> [parameters]
   dronekit-sitl <plane(-version)> [parameters]
+  dronekit-sitl <rover(-version)> [parameters]
   dronekit-sitl <solo(-version)> [parameters]
 ```
 

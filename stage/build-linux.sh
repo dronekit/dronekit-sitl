@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Linux specific
-# sudo apt-get install -y gcc-arm-linux-gnueabi make gcc-4.8 g++-4.8
+# sudo apt-get install -y gcc-arm-linux-gnueabi make gawk gcc-4.8 g++-4.8
 # sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50
 # sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50
 # sudo pip install awscli
@@ -47,5 +47,4 @@ cp /tmp/$TARGET_ARDU.build/$TARGET_ARDU.elf . || true
 cd $STARTDIR
 tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/ardupilot/$TARGET_ARDU/ $TARGET_ARDU.elf $TARARGS
 
-pip install awscli
 $AWSCMD s3 cp build/sitl.tar.gz s3://dronekit-sitl-binaries/$TARGET_LABEL/sitl-$OSID-v$TARGET_VERSION.tar.gz --acl public-read

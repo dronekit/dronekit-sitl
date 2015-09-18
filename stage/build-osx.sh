@@ -47,5 +47,4 @@ cp /tmp/$TARGET_ARDU.build/$TARGET_ARDU.elf . || true
 cd $STARTDIR
 tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/ardupilot/$TARGET_ARDU/ $TARGET_ARDU.elf $TARARGS
 
-pip install awscli
 $AWSCMD s3 cp build/sitl.tar.gz s3://dronekit-sitl-binaries/$TARGET_LABEL/sitl-$OSID-v$TARGET_VERSION.tar.gz --acl public-read

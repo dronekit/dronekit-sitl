@@ -45,10 +45,7 @@ def spawn(target, *args):
     return t
 
 def udp(port):
-    address = ('127.0.0.1', port)
     sock = socket.socket(type=socket.SOCK_DGRAM)
-
-    sock.bind(address)
 
     in_queue = Queue()
     out_queue = Queue() 
@@ -70,15 +67,15 @@ def udp(port):
                 wait_write(sock.fileno())
                 (msg, target) = out_queue.get()
                 #print(role, 'sending %s' % msg)
-                out_bytes = sock.sendto(msg, ('127.0.0.1', target))
+                out_bytes = sock.sendto(msg, ('0.0.0.0', target))
             except socket.error as e:
                 print('Socket error:', e)
                 break
 
-    spawn(read)
-    spawn(write)
+    thr = spawn(read)
+    thw = spawn(write)
 
-    return (in_queue, out_queue)
+    return (in_queue, out_queue, thr, thw)
 
 
 
@@ -106,123 +103,96 @@ def request_data_stream_send(master, rate=1):
 from Queue import Queue
 from threading import Thread
 
-class MPFakeState:
-    def __init__(self, master, status_printer=None):
-        self.mav = mavutil.mavlink.MAVLink(MavWriter(self.out_queue), srcSystem=self.master.source_system, use_native=False)
+def forward():
+    mav = mavutil.mavlink.MAVLink(MavWriter(self.out_queue), srcSystem=0, use_native=False)
+    #self.master
 
-    def prepare(self, await_params=False):
-        # errprinter('Await heartbeat.')
-        # TODO this should be more rigious. How to avoid
-        #   invalid MAVLink prefix '73'
-        #   invalid MAVLink prefix '13'
+    import atexit
+    self.exiting = False
+    def onexit():
+        self.exiting = True
+    atexit.register(onexit)
 
-        import atexit
-        self.exiting = False
-        def onexit():
-            self.exiting = True
-        atexit.register(onexit)
+    # Wait for incoming messages.
+    (inudp, outudp, thr, thw) = udp(6760)
 
-        heartbeat_started = False
+    def mavlink_thread():
+        # Huge try catch in case we see http://bugs.python.org/issue1856
+        try:
+            while True:
+                # Downtime                    
+                time.sleep(0.05)
 
-        def mavlink_thread():
-            # Huge try catch in case we see http://bugs.python.org/issue1856
-            try:
                 while True:
-                    # Downtime                    
-                    time.sleep(0.05)
+                    try:
+                        msg = inudp.get_nowait()
+                        self.master.write(msg)
+                    except socket.error as error:
+                        if error.errno == ECONNABORTED:
+                            errprinter('reestablishing connection after read timeout')
+                            try:
+                                self.master.close()
+                            except:
+                                pass
+                            self.master = mavutil.mavlink_connection(self.master.address)
+                            continue
 
-                    while True:
-                        try:
-                            msg = self.out_queue.get_nowait()
-                            self.master.write(msg)
-                        except socket.error as error:
-                            if error.errno == ECONNABORTED:
-                                errprinter('reestablishing connection after read timeout')
-                                try:
-                                    self.master.close()
-                                except:
-                                    pass
-                                self.master = mavutil.mavlink_connection(self.master.address)
-                                continue
+                        # If connection reset (closed), stop polling.
+                        return
+                    except Empty:
+                        break
+                    except Exception as e:
+                        errprinter('mav send error:', e)
+                        break
 
-                            # If connection reset (closed), stop polling.
-                            return
-                        except Empty:
-                            break
-                        except Exception as e:
-                            errprinter('mav send error:', e)
-                            break
+                while True:
+                    try:
+                        msg = self.master.recv_msg()
+                    except socket.error as error:
+                        if error.errno == ECONNABORTED:
+                            errprinter('reestablishing connection after send timeout')
+                            try:
+                                self.master.close()
+                            except:
+                                pass
+                            self.master = mavutil.mavlink_connection(self.master.address)
+                            continue
 
-                    while True:
-                        try:
-                            msg = self.master.recv_msg()
-                        except socket.error as error:
-                            if error.errno == ECONNABORTED:
-                                errprinter('reestablishing connection after send timeout')
-                                try:
-                                    self.master.close()
-                                except:
-                                    pass
-                                self.master = mavutil.mavlink_connection(self.master.address)
-                                continue
+                        # If connection reset (closed), stop polling.
+                        return
+                    except Exception as e:
+                        # TODO debug these.
+                        # errprinter('mav recv error:', e)
+                        msg = None
+                    if not msg:
+                        break
 
-                            # If connection reset (closed), stop polling.
-                            return
-                        except Exception as e:
-                            # TODO debug these.
-                            # errprinter('mav recv error:', e)
-                            msg = None
-                        if not msg:
-                            break
+                    outudp.put((msg, 6760))
 
-                        # TODO message
-
-            except Exception as e:
-                # http://bugs.python.org/issue1856
-                if self.exiting:
-                    pass
-                else:
-                    raise e
+        except Exception as e:
+            # http://bugs.python.org/issue1856
+            if self.exiting:
+                pass
+            else:
+                raise e
 
 
-        t = Thread(target=mavlink_thread)
-        t.daemon = True
-        t.start()
+    t = Thread(target=mavlink_thread)
+    t.daemon = True
+    t.start()
 
-        # Wait for incoming messages.
+    print('udpin:127.0.0.1:6760')
+
+    t.join()
+    thr.join()
+    thw.join()
+
+    print('done.')
 
 
-        # Wait for first heartbeat.
-        while True:
-            try:
-                self.master.wait_heartbeat()
-                break
-            except mavutil.mavlink.MAVError:
-                continue
-        heartbeat_started = True
-
-        # Request a list of all parameters.
-        request_data_stream_send(self.master)
-        while True:
-            # This fn actually rate limits itself to every 2s.
-            # Just retry with persistence to get our first param stream.
-            self.master.param_fetch_all()
-            time.sleep(0.1)
-            if params.mav_param_count > -1:
-                break
-
-        # We now should get parameters streaming in.
-        # We may not get the full set; we leave the logic to mavlink_thread
-        # to determine what params we yet need. Wait if await_params is True.
-        if await_params:
-            while not params.loaded:
-                time.sleep(0.1)
-
-        return self.api
-
-def connect(ip, await_params=False, status_printer=errprinter):
-    import droneapi.module.api as api
-    state = MPFakeState(mavutil.mavlink_connection(ip))
-    state.status_printer = status_printer
-    # api.init(state)
-    return state.prepare(await_params=await_params).get_vehicles()[0]
+# def connect(ip, await_params=False, status_printer=errprinter):
+#     import droneapi.module.api as api
+#     state = MPFakeState(mavutil.mavlink_connection(ip))
+#     state.status_printer = status_printer
+#     # api.init(state)
+#     return state.prepare(await_params=await_params).get_vehicles()[0]

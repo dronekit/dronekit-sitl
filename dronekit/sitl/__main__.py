@@ -32,4 +32,8 @@ if sys.platform == 'win32':
 if not any(x.startswith('--home') for x in sys.argv):
     sys.argv.append('--home=-35.363261,149.165230,584,353')
 
+# Provide a --model argument if one was not provided.
+if not any(x.startswith('--model') for x in sys.argv):
+    sys.argv.append('--model=quad')
+
 main(sys.argv[1:])

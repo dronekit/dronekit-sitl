@@ -60,12 +60,13 @@ mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14
 
 ## Ardupilot versions available:
 
-We are providing hosting for some pre-compiled Ardupilot Copter and Plane binaries
+We are providing hosting for some pre-compiled Ardupilot Copter, Plane and Rover binaries
 
 | Platform | List |
 |------|----|
 | Copter | <http://dronekit-sitl-binaries.s3-website-us-east-1.amazonaws.com/copter/> |
 | Plane | <http://dronekit-sitl-binaries.s3-website-us-east-1.amazonaws.com/plane/> |
+| Rover | <http://dronekit-sitl-binaries.s3-website-us-east-1.amazonaws.com/rover/> |
 
 
 ## API

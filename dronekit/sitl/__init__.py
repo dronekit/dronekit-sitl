@@ -210,14 +210,19 @@ class SITL():
         return self.poll()
 
     def complete(self, verbose=False):
-        while self.poll() == None:
-            line = self.stdout.readline(0.01)
-            if line and verbose:
-                sys.stdout.write(line)
+        while True:
+            alive = self.poll()
 
-            line = self.stderr.readline(0.01)
-            if line and verbose:
-                sys.stderr.write(line)
+            out = self.stdout.readline(0.01)
+            if out and verbose:
+                sys.stdout.write(out)
+
+            err = self.stderr.readline(0.01)
+            if err and verbose:
+                sys.stderr.write(err)
+
+            if not out and not err and alive != None:
+                break
 
 def launch(system, version, args):
     return SITL(system, version, args)

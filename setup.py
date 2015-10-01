@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 setup(name='dronekit_sitl',
-      version='2.1.1',
+      version='2.1.2',
       description='Runs SITL as part of DroneKit.',
       author='Tim Ryan',
       author_email='tim@3drobotics.com',
@@ -11,7 +11,7 @@ setup(name='dronekit_sitl',
       install_requires = ['psutil>=3.0'],
       entry_points={
           'console_scripts': [
-              'dronekit-sitl = dronekit.sitl.__main__'
+              'dronekit-sitl = dronekit.sitl.__init__:main'
           ]
       },
       packages = ['dronekit', 'dronekit.sitl'],

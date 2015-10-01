@@ -242,7 +242,10 @@ def reset():
         pass
     print('SITL directory cleared.')
 
-def main(args=[]):
+def main(args=None):
+    if args == None:
+        args = sys.argv[1:]
+
     system = 'copter'
     target = detect_target()
     version = '3.2.1'

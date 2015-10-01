@@ -139,6 +139,26 @@ class SITL():
         else:
             args = [os.path.join('.', args[0])] + args[1:]
 
+        if local:
+            wd = os.getcwd()
+        else:
+            wd = os.path.join(sitl_target, self.system + '-' + self.version)
+
+        # Load the binary for primitive feature detection.
+        elf = open(os.path.join(wd, args[0])).read()
+
+        # Provide a --home argument if one was not provided.
+        # This stabilizes defaults in SITL.
+        # https://github.com/dronekit/dronekit-sitl/issues/34
+        if '--home' in elf:
+            if not any(x.startswith('--home') for x in args):
+                args.append('--home=-35.363261,149.165230,584,353')
+
+        # Provide a --model argument if one was not provided.
+        if '--model' in elf:
+            if not any(x.startswith('--model') for x in args):
+                args.append('--model=quad')
+
         if verbose:
             print('Execute:', str(args))
 
@@ -150,10 +170,7 @@ class SITL():
         # else:
         #     sitl = Popen(sitl_args, stdout=PIPE, stderr=PIPE)
 
-        if local:
-            p = Popen(args, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
-        else:
-            p = Popen(args, cwd=os.path.join(sitl_target, self.system + '-' + self.version), shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
+        p = Popen(args, cwd=wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
         self.p = p
 
         def cleanup():
@@ -277,6 +294,7 @@ def main(args=[]):
     sitl = SITL(system, version)
     if not local:
         sitl.download(target, verbose=True)
+
     sitl.launch(args, verbose=True, local=local)
     # sitl.block_until_ready(verbose=True)
     code = sitl.complete(verbose=True)

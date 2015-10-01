@@ -7,7 +7,7 @@
 Install from Github:
 
 ```
-pip2 install git+https://github.com/dronekit/dronekit-sitl
+pip2 install dronekit-sitl -UI
 ```
 
 ## Usage

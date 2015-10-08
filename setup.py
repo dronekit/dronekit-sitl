@@ -15,5 +15,4 @@ setup(name='dronekit_sitl',
           ]
       },
       packages = ['dronekit', 'dronekit.sitl'],
-      namespace_packages = ['dronekit']
       )

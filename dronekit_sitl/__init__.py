@@ -246,6 +246,27 @@ def main(args=None):
     if args == None:
         args = sys.argv[1:]
 
+        if sys.platform == 'win32':
+            # Powershell will munge commas as separate arguments
+            # which conflicts with how the --home parameter is sent.
+            # We opt to just fix this rather than laboriously restructure
+            # existing documentation.
+            i = 0
+            while i < len(args):
+                if args[i].startswith('--home'):
+                    if args[i] == '--home':
+                        args[i] = '--home='
+                    i += 1
+                    while i < len(args):
+                        if re.match(r'[\-+0-9.,]+', args[i]):
+                            args[i-1] += ',' + args[i]
+                            args[i-1] = re.sub(r'=,', '=', args[i-1])
+                            args.pop(i)
+                        else:
+                            i += 1
+                else:
+                    i += 1
+
     system = 'copter'
     target = detect_target()
     version = '3.2.1'

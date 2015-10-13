@@ -1,4 +1,4 @@
-from dronekit.sitl import SITL
+from dronekit_sitl import SITL
 from nose.tools import assert_equals
 
 copter_args = ['-I0', '-S', '--model', 'quad', '--home=-35.363261,149.165230,584,353']

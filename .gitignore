@@ -6,3 +6,4 @@ logs
 *.egg*
 *.pyc
 build
+env

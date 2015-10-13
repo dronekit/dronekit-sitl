@@ -2,7 +2,7 @@
 
 import sys
 import re
-from dronekit.sitl import main
+from dronekit_sitl import main
 
 if sys.platform == 'win32':
     # Powershell will munge commas as separate arguments

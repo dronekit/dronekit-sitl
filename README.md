@@ -74,7 +74,7 @@ We are providing hosting for some pre-compiled Ardupilot Copter, Plane and Rover
 SITL exposes a Python API for managing a SITL instance.
 
 ```
-from dronekit.sitl import SITL
+from dronekit_sitl import SITL
 sitl = SITL(system, version) # launch system (e.g. "copter") and version (e.g. "3.3")
 sitl.download(target, verbose=False) # explicitly download version
 sitl.launch(args, verbose=False, auto_download=True, await_ready=False, restart=False)
@@ -87,4 +87,4 @@ sitl.stop() # terminates SITL
 
 ## License
 
-dronekit-sitl-runner is licensed as MIT/ASL2
+dronekit-sitl is licensed as MIT/ASL2

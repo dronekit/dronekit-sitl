@@ -1,13 +1,16 @@
 environment:
   global: {}
-init: []
+
 install:
-  - cmd: 'setlocal & python setup.py install & endlocal'
-  - cmd: 'setlocal & python -m pip install pip & endlocal'
-  - cmd: "setlocal & SET PATH=%PYTHON%;c:\\Python27\\Scripts;%PATH% & pip install nose & endlocal"
+  - cmd: 'SET PATH=%PYTHON%;c:\\Python27\\Scripts;%PATH%'
+  - cmd: 'python -m pip install pip'
+  - cmd: 'python setup.py install'
+  - cmd: 'pip install nose'
+
 build_script:
-  - cmd: "setlocal & SET PATH=%PYTHON%;c:\\Python27\\Scripts;%PATH% & cd c:\ & dronekit-sitl --list & endlocal"
-  - cmd: "setlocal & SET PATH=%PYTHON%;c:\\Python27\\Scripts;%PATH% & nosetests tests & endlocal"
+  - cmd: 'setlocal & cd c:\\ & dronekit-sitl --list & endlocal'
+  - cmd: 'nosetests tests'
+
 clone_depth: 10
 cache:
   - '%CYG_CACHE%'

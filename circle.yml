@@ -2,13 +2,11 @@ machine:
   environment: {}
 dependencies:
   pre:
-    - python setup.py install
-    - pip install nose
-  override:
-    - cd / && dronekit-sitl --list
-    - nosetests tests
+    - 'python setup.py install'
+    - 'pip install nose'
 test:
   override:
-    - 'true'
+    - 'cd / && dronekit-sitl --list'
+    - 'nosetests tests'
 general:
   build_dir: .

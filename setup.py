@@ -3,16 +3,19 @@
 from setuptools import setup, find_packages
 
 setup(name='dronekit_sitl',
-      version='2.2.0',
-      description='Runs SITL as part of DroneKit.',
+      version='2.3.0',
+      description='DroneKit library to run SITL (simulation environment)',
       author='Tim Ryan',
       author_email='tim@3drobotics.com',
-      url='https://github.com/tcr3dr/dronekit-sitl-runner/',
-      install_requires = ['psutil>=3.0'],
+      url='https://github.com/dronekit/dronekit-sitl/',
+      install_requires = [
+        'psutil>=3.0',
+        'dronekit>=2.0.0b2',
+      ],
       entry_points={
           'console_scripts': [
-              'dronekit-sitl = dronekit.sitl.__init__:main'
+              'dronekit-sitl = dronekit_sitl.__init__:main'
           ]
       },
-      packages = ['dronekit', 'dronekit.sitl'],
+      packages = ['dronekit_sitl'],
       )

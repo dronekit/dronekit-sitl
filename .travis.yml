@@ -1,14 +1,13 @@
-before_install: []
 env:
   global: []
+
 install:
-  - 'a() { set -e; }'
-  - "z() { E=$?; test $E -eq 0 && return 0; printf \"\\n\\033[1;31mThe command failed with exit code $?.\\033[0m\"; set -e; return $E; }"
-  - (a; sudo python setup.py install );z
-  - (a; sudo pip install nose );z
+  - 'sudo python setup.py install'
+  - 'sudo pip install nose'
 script:
-  - (a; cd /; dronekit-sitl --list );z
-  - (a; nosetests tests );z
+  - '( cd /; dronekit-sitl --list; )'
+  - 'nosetests tests'
+
 git:
   depth: 10
 language: objective-c

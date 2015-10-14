@@ -4,11 +4,13 @@
 
 ## Installing
 
-Install from Github:
+Install from PyPi:
 
 ```
 pip2 install dronekit-sitl -UI
 ```
+
+
 
 ## Usage
 

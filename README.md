@@ -4,12 +4,11 @@
 
 ## Installing
 
-Install from PyPi:
+Install using pip:
 
 ```
 pip2 install dronekit-sitl -UI
 ```
-
 
 
 ## Usage
@@ -89,4 +88,6 @@ sitl.stop() # terminates SITL
 
 ## License
 
-dronekit-sitl is licensed as MIT/ASL2
+dronekit-sitl is licensed as MIT, Apache-2.0, and GPLv3.
+
+pysim is licensed as GPLv3.

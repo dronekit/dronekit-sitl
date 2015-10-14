@@ -22,6 +22,7 @@ from subprocess import Popen, PIPE
 from os.path import expanduser
 from threading import Thread
 from Queue import Queue, Empty
+import dronekit
 
 sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
 sitl_target = os.path.normpath(expanduser('~/.dronekit/sitl'))
@@ -134,33 +135,73 @@ class SITL():
             "solo": "ArduCopter.elf",
         }
 
-        if not local:
-            args = [os.path.join('.', elfname[self.system])] + args
-        else:
-            args = [os.path.join('.', args[0])] + args[1:]
-
         if local:
             wd = os.getcwd()
         else:
             wd = os.path.join(sitl_target, self.system + '-' + self.version)
 
+        if not local:
+            args = [os.path.join('.', elfname[self.system])] + args
+        else:
+            args = [os.path.join('.', args[0])] + args[1:]
+
         # Load the binary for primitive feature detection.
-        elf = open(os.path.join(wd, args[0])).read()
+        elf = open(os.path.join(wd, args[0]), 'rb').read()
 
-        # Provide a --home argument if one was not provided.
-        # This stabilizes defaults in SITL.
-        # https://github.com/dronekit/dronekit-sitl/issues/34
-        if '--home' in elf:
-            if not any(x.startswith('--home') for x in args):
-                args.append('--home=-35.363261,149.165230,584,353')
+        # pysim is required for earlier SITL builds
+        # lacking --home or --model params.
+        need_sim = not '--home' in elf or not '--model' in elf
+        self.using_sim = need_sim
 
-        # Provide a --model argument if one was not provided.
-        if '--model' in elf:
-            if not any(x.startswith('--model') for x in args):
-                args.append('--model=quad')
+        # Run pysim
+        if need_sim:
+            import argparse
+            parser = argparse.ArgumentParser(usage=argparse.SUPPRESS)
+            parser.add_argument('-I')
+            parser.add_argument('--home')
+            parser.add_argument('--rate')
+            parser.add_argument('--model')
+            parser.add_argument('-C', action='store_true')
+            def noop(*args, **kwargs):
+                pass
+
+            parser.error = noop
+            out = parser.parse_known_args(args[1:])
+            if out == None:
+                print('Warning! Couldn\'t recognize arguments passed to legacy SITL.', file=sys.stderr)
+            else:
+                res, rest = out
+
+                # Fixup actual args.
+                args = [args[0]]
+                if res.I:
+                    args += ['-I' + res.I]
+                if res.C:
+                    args += ['-C']
+
+                # Legacy name for quad is +
+                if res.model == 'quad':
+                    res.model = '+'
+
+                # pysim args
+                print('Note: Starting pysim for legacy SITL.')
+                simargs = [sys.executable, os.path.join(os.path.dirname(__file__), 'pysim/sim_wrapper.py'),
+                           '--simin=127.0.0.1:5502', '--simout=127.0.0.1:5501', '--fgout=127.0.0.1:5503',
+                           '--home='+res.home, '--frame='+res.model]
+                psim = Popen(simargs, cwd=wd, shell=sys.platform == 'win32')
+
+                def cleanup_sim():
+                    try:
+                        kill(psim.pid)
+                    except:
+                        pass
+                atexit.register(cleanup_sim)
+
+                if verbose:
+                    print('Pysim:', ' '.join((simargs)))
 
         if verbose:
-            print('Execute:', str(args))
+            print('Execute:', ' '.join((args)))
 
         # # Change CPU core affinity.
         # # TODO change affinity on osx/linux
@@ -169,6 +210,12 @@ class SITL():
         #     sitl = Popen(['start', '/affinity', '14', '/realtime', '/b', '/wait'] + sitl_args, shell=True, stdout=PIPE, stderr=PIPE)
         # else:
         #     sitl = Popen(sitl_args, stdout=PIPE, stderr=PIPE)
+
+        # Attempt to delete eeprom.bin
+        try:
+            os.remove(os.path.join(wd, 'eeprom.bin'))
+        except:
+            pass
 
         p = Popen(args, cwd=wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
         self.p = p
@@ -182,6 +229,22 @@ class SITL():
 
         self.stdout = NonBlockingStreamReader(p.stdout)
         self.stderr = NonBlockingStreamReader(p.stderr)
+
+        # Run dronekit
+        if need_sim:
+            time.sleep(0.5)
+            vehicle = dronekit.connect('tcp:127.0.0.1:5760')
+            for line in open(os.path.join(os.path.dirname(__file__), 'defaults.parm')):
+                if re.match(r'^\s*#', line):
+                    continue
+                try:
+                    pname, pvalue = line.split()
+                    vehicle.parameters.set(pname, float(pvalue), retries=0)
+                except Exception as e:
+                    import traceback
+                    traceback.print_exc()
+            vehicle.flush()
+            vehicle.close()
 
         if await_ready:
             self.block_until_ready(verbose=verbose)
@@ -245,6 +308,34 @@ def reset():
 def main(args=None):
     if args == None:
         args = sys.argv[1:]
+
+        if sys.platform == 'win32':
+            # Powershell will munge commas as separate arguments
+            # which conflicts with how the --home parameter is sent.
+            # We opt to just fix this rather than laboriously restructure
+            # existing documentation.
+            i = 0
+            while i < len(args):
+                if args[i].startswith('--home'):
+                    if args[i] == '--home':
+                        args[i] = '--home='
+                    i += 1
+                    while i < len(args):
+                        if re.match(r'[\-+0-9.,]+', args[i]):
+                            args[i-1] += ',' + args[i]
+                            args[i-1] = re.sub(r'=,', '=', args[i-1])
+                            args.pop(i)
+                        else:
+                            i += 1
+                else:
+                    i += 1
+
+    # Defaults stabilizes SITL emulation.
+    # https://github.com/dronekit/dronekit-sitl/issues/34
+    if not any(x.startswith('--home') for x in args):
+        args.append('--home=-35.363261,149.165230,584,353')
+    if not any(x.startswith('--model') for x in args):
+        args.append('--model=quad')
 
     system = 'copter'
     target = detect_target()

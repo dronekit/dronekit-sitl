@@ -146,11 +146,12 @@ class SITL():
             args = [os.path.join('.', args[0])] + args[1:]
 
         # Load the binary for primitive feature detection.
-        elf = open(os.path.join(wd, args[0])).read()
+        elf = open(os.path.join(wd, args[0]), 'rb').read()
 
         # pysim is required for earlier SITL builds
         # lacking --home or --model params.
         need_sim = not '--home' in elf or not '--model' in elf
+        self.using_sim = need_sim
 
         # Run pysim
         if need_sim:

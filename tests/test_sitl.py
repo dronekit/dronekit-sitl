@@ -8,7 +8,10 @@ def test_sitl():
     sitl.download()
     sitl.launch(copter_args)
     sitl.block_until_ready()
+    
     assert_equals(sitl.poll(), None, 'SITL should still be running.')
+    assert_equals(sitl.using_sim, False, 'SITL for copter-3.3 should not be using pysim')
+
     sitl.stop()
     assert sitl.poll() != None, 'SITL should stop running after kill.'
 

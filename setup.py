@@ -10,7 +10,11 @@ setup(name='dronekit_sitl',
       url='https://github.com/dronekit/dronekit-sitl/',
       install_requires = [
         'psutil>=3.0',
+        'dronekit>=2.0.0b4',
       ],
+      package_data={
+        'dronekit_sitl': ['*'],
+      },
       entry_points={
           'console_scripts': [
               'dronekit-sitl = dronekit_sitl.__init__:main'

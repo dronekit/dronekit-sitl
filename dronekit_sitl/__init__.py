@@ -22,6 +22,7 @@ from subprocess import Popen, PIPE
 from os.path import expanduser
 from threading import Thread
 from Queue import Queue, Empty
+import dronekit
 
 sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
 sitl_target = os.path.normpath(expanduser('~/.dronekit/sitl'))
@@ -149,7 +150,10 @@ class SITL():
 
         # pysim is required for earlier SITL builds
         # lacking --home or --model params.
-        if not '--home' in elf or not '--model' in elf:
+        need_sim = not '--home' in elf or not '--model' in elf
+
+        # Run pysim
+        if need_sim:
             import argparse
             parser = argparse.ArgumentParser(usage=argparse.SUPPRESS)
             parser.add_argument('-I')
@@ -206,6 +210,12 @@ class SITL():
         # else:
         #     sitl = Popen(sitl_args, stdout=PIPE, stderr=PIPE)
 
+        # Attempt to delete eeprom.bin
+        try:
+            os.remove(os.path.join(wd, 'eeprom.bin'))
+        except:
+            pass
+
         p = Popen(args, cwd=wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
         self.p = p
 
@@ -218,6 +228,22 @@ class SITL():
 
         self.stdout = NonBlockingStreamReader(p.stdout)
         self.stderr = NonBlockingStreamReader(p.stderr)
+
+        # Run dronekit
+        if need_sim:
+            time.sleep(0.5)
+            vehicle = dronekit.connect('tcp:127.0.0.1:5760')
+            for line in open(os.path.join(os.path.dirname(__file__), 'defaults.parm')):
+                if re.match(r'^\s*#', line):
+                    continue
+                try:
+                    pname, pvalue = line.split()
+                    vehicle.parameters.set(pname, float(pvalue), retries=0)
+                except Exception as e:
+                    import traceback
+                    traceback.print_exc()
+            vehicle.flush()
+            vehicle.close()
 
         if await_ready:
             self.block_until_ready(verbose=verbose)

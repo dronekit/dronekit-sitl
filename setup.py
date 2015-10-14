@@ -3,7 +3,7 @@
 from setuptools import setup, find_packages
 
 setup(name='dronekit_sitl',
-      version='2.3.0',
+      version='2.4.0',
       description='DroneKit library to run SITL (simulation environment)',
       author='Tim Ryan',
       author_email='tim@3drobotics.com',

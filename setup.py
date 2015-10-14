@@ -10,10 +10,10 @@ setup(name='dronekit_sitl',
       url='https://github.com/dronekit/dronekit-sitl/',
       install_requires = [
         'psutil>=3.0',
-        'dronekit>=2.0.0b4',
+        'dronekit>=2.0.0b5',
       ],
       package_data={
-        'dronekit_sitl': ['*'],
+        'dronekit_sitl': ['*.parm'],
       },
       entry_points={
           'console_scripts': [

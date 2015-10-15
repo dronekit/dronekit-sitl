@@ -4,10 +4,15 @@
 
 ## Installing
 
-Install using pip:
+Install using pip (recommended):
 
 ```
 pip2 install dronekit-sitl -UI
+```
+
+Installing from github master:
+```
+pip2 install git+https://github.com/dronekit/dronekit-sitl
 ```
 
 

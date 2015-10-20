@@ -19,4 +19,4 @@ if ( -Not ( Test-Path $CYG_BASH )) {
 	cd $STARTDIR
 }
 
-& $CYG_BASH .\cygwin.sh $label $classname $version
+& $CYG_BASH .\build-win-cygwin.sh $label $classname $version

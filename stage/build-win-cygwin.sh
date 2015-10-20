@@ -3,7 +3,6 @@
 # Windows specific
 # pip install awscli
 MAKEARGS=""
-TARARGS="-C c:/cygwin/bin/ cyggcc_s-1.dll cygstdc++-6.dll cygwin1.dll"
 OSID="win"
 AWSCMD="aws.cmd"
 
@@ -40,7 +39,10 @@ buildit () {
 buildit || buildit || buildit
 
 cp /tmp/$TARGET_ARDU.build/$TARGET_ARDU.elf . || true
+cp $STARTDIR/build/ardupilot/$TARGET_ARDU/$TARGET_ARDU.elf $STARTDIR/out/apm.exe
+cp c:/cygwin/bin/cyggcc_s-1.dll c:/cygwin/bin/cygstdc++-6.dll c:/cygwin/bin/cygwin1.dll $STARTDIR/out
+
 cd $STARTDIR
-tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/ardupilot/$TARGET_ARDU/ $TARGET_ARDU.elf $TARARGS
+tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/out .
 
 $AWSCMD s3 cp build/sitl.tar.gz s3://dronekit-sitl-binaries/$TARGET_LABEL/sitl-$OSID-v$TARGET_VERSION.tar.gz --acl public-read

@@ -1,29 +1,28 @@
 {
-  "copter": { 
+  "copter": {
+    "stable": "3.3",
     "3.2.1": {
-      "stable": false,
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-copter-3.2.1.tar.gz"
     },
     "3.3": {
-      "stable": true,
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-copter-3.3.tar.gz"
     }
   },
   "solo": {
+    "stable": "1.2.0",
     "1.2.0": {
-      "stable": true,
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-solo-1.2.0.tar.gz"
     }
   },
   "plane": {
+    "stable": "3.3.0",
     "3.3.0": {
-      "stable": true,
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-plane-3.3.0.tar.gz"
     }
   },
   "rover": {
+    "stable": "2.50",
     "2.50": {
-      "stable": true,
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-rover-2.50.tar.gz"
     }
   }

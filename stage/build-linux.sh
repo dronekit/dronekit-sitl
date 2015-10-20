@@ -7,7 +7,6 @@
 # sudo pip install awscli
 alias gawk=gcc
 MAKEARGS=""
-TARARGS=""
 OSID="linux"
 AWSCMD="aws"
 
@@ -29,6 +28,8 @@ set -x
 STARTDIR=$(pwd)
 rm -rf build ardupilot.tar.gz sitl.tar.gz
 mkdir -p build/ardupilot
+mkdir -p build/test
+mkdir -p build/out
 cd build
 wget -qO ardupilot.tar.gz https://github.com/tcr3dr/ardupilot-releases/archive/builder-$TARGET_LABEL-$TARGET_VERSION.tar.gz
 tar -xf ardupilot.tar.gz --strip-components=1 -C ardupilot
@@ -44,7 +45,15 @@ buildit () {
 buildit || buildit || buildit
 
 cp /tmp/$TARGET_ARDU.build/$TARGET_ARDU.elf . || true
+cp $STARTDIR/build/ardupilot/$TARGET_ARDU/$TARGET_ARDU.elf $STARTDIR/out
+cp $STARTDIR/build/ardupilot/$TARGET_ARDU/$TARGET_ARDU.elf $STARTDIR/out/apm
+
 cd $STARTDIR
-tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/ardupilot/$TARGET_ARDU/ $TARGET_ARDU.elf $TARARGS
+python eepromgen.py
+cp $STARTDIR/build/test/eeprom.bin $STARTDIR/build/out/
+python eepromtest.py
+
+cd $STARTDIR
+tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/out .
 
 $AWSCMD s3 cp build/sitl.tar.gz s3://dronekit-sitl-binaries/$TARGET_LABEL/sitl-$OSID-v$TARGET_VERSION.tar.gz --acl public-read

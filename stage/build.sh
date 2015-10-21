@@ -111,9 +111,9 @@ fi
 	pip install ../ -U --no-cache-dir
 
 	python eepromgen.py
-	cp $STARTDIR/build/test/eeprom.bin $STARTDIR/build/out/
-	python eepromtest.py || exit 1
-);
+	cp $STARTDIR/build/test/eeprom.bin $STARTDIR/build/out/default_eeprom.bin
+	python eepromtest.py
+) || exit 1;
 
 cd $STARTDIR
 tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/out .

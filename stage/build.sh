@@ -1,9 +1,8 @@
 #!/bin/bash
 
 TARGET_LABEL="$1"
-TARGET_ARDU="$2"
-TARGET_VERSION="$3"
-TARGET_PUBLISH="$4"
+TARGET_VERSION="$2"
+TARGET_PUBLISH="$3"
 
 STAGING="$(pwd)/build/staging"
 STARTDIR=$(pwd)
@@ -52,10 +51,13 @@ fi
 # Define params file
 if [[ $TARGET_LABEL == rover ]]; then
 	PARMS='Tools/autotest/Rover.parm'
+	TARGET_ARDU='APMrover2'
 elif [[ $TARGET_LABEL == plane ]]; then
 	PARMS='Tools/autotest/ArduPlane.parm'
+	TARGET_ARDU='ArduPlane'
 else
 	PARMS='Tools/autotest/copter_params.parm'
+	TARGET_ARDU='ArduCopter'
 fi
 
 echo "Building in $(pwd) ..."
@@ -73,6 +75,7 @@ rm -rf build
 mkdir -p build/ardupilot
 mkdir -p build/test
 mkdir -p build/out
+mkdir -p publish
 cd build
 wget -qO ardupilot.tar.gz https://github.com/tcr3dr/ardupilot-releases/archive/builder-$TARGET_LABEL-$TARGET_VERSION.tar.gz
 tar -xf ardupilot.tar.gz --strip-components=1 -C ardupilot
@@ -115,9 +118,11 @@ fi
 	python eepromtest.py
 ) || exit 1;
 
+TARGET_ARCHIVE="sitl-$OSID-$TARGET_LABEL-$TARGET_VERSION.tar.gz"
+
 cd $STARTDIR
-tar -cvf $STARTDIR/build/sitl.tar.gz -C $STARTDIR/build/out .
+tar -cvf $STARTDIR/publish/$TARGET_ARCHIVE -C $STARTDIR/build/out .
 
 if [[ $TARGET_PUBLISH == 'publish' ]]; then
-	$AWSCMD s3 cp build/sitl.tar.gz s3://dronekit-sitl-binaries/$TARGET_LABEL/sitl-$OSID-v$TARGET_VERSION.tar.gz --acl public-read
+	$AWSCMD s3 cp publish/$TARGET_ARCHIVE s3://dronekit-sitl-binaries/$TARGET_LABEL/$TARGET_ARCHIVE --acl public-read
 fi

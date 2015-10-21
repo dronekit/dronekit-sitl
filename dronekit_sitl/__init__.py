@@ -20,13 +20,12 @@ import select
 import psutil
 import tempfile
 from subprocess import Popen, PIPE
-from os.path import expanduser
 from threading import Thread
 from Queue import Queue, Empty
 import dronekit
 
 sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
-sitl_target = os.path.normpath(expanduser('~/.dronekit/sitl'))
+sitl_target = os.path.normpath(os.path.expanduser('~/.dronekit/sitl'))
 
 def kill(proc_pid):
     process = psutil.Process(proc_pid)

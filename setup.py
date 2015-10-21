@@ -22,3 +22,8 @@ setup(name='dronekit_sitl',
       },
       packages = ['dronekit_sitl', 'dronekit_sitl.pysim'],
       )
+
+# Delete home dir scripts for fresh install, just in case.
+import shutil
+sitl_target = os.path.normpath(os.path.expanduser('~/.dronekit/sitl'))
+shutil.rmtree(sitl_target)

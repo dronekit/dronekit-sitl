@@ -13,6 +13,3 @@ if ( -Not ( Test-Path $CYG_BASH )) {
 	cygcheck -dc cygwin | Write-Output
 	cd $STARTDIR
 }
-
-# Pass all arguments to build script
-& $CYG_BASH .\build.sh $args

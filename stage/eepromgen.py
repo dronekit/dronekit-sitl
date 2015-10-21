@@ -10,6 +10,11 @@ s.launch([], wd=os.path.join(os.path.dirname(__file__), 'build/test'))
 
 time.sleep(.5)
 vehicle = dronekit.connect('tcp:127.0.0.1:5760')
+
+# ARMING_ECHECK
+vehicle.parameters.set('ARMING_CHECK', 0.0, retries=0)
+
+# Defaults
 for line in open(os.path.join(os.path.dirname(__file__), 'build/out/default.parm')):
     if re.match(r'^\s*#', line):
         continue
@@ -19,6 +24,7 @@ for line in open(os.path.join(os.path.dirname(__file__), 'build/out/default.parm
     except Exception as e:
         import traceback
         traceback.print_exc()
+
 vehicle.flush()
 time.sleep(5)
 vehicle.close()

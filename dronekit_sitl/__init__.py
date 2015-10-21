@@ -85,7 +85,7 @@ def version_list():
     return versions
 
 def download(system, version, target, verbose=False):
-    sitl_file = "{}/{}/sitl-{}-v{}.tar.gz".format(sitl_host, system, target, version)
+    sitl_file = "{}/{}/sitl-{}-{}-{}.tar.gz".format(sitl_host, system, target, system, version)
 
     if not os.path.isdir(sitl_target + '/' + system + '-' + version):
         if verbose:

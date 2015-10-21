@@ -7,7 +7,6 @@ TARGET_PUBLISH="$3"
 STAGING="$(pwd)/build/staging"
 STARTDIR=$(pwd)
 
-# Linux specific
 if [[ $OSTYPE == darwin* ]]; then
 	# OSX
 	echo 'os: osx'
@@ -121,7 +120,8 @@ fi
 TARGET_ARCHIVE="sitl-$OSID-$TARGET_LABEL-$TARGET_VERSION.tar.gz"
 
 cd $STARTDIR
-tar -cvf $STARTDIR/publish/$TARGET_ARCHIVE -C $STARTDIR/build/out .
+mkdir -p $STARTDIR/publish/$TARGET_LABEL
+tar -cvf $STARTDIR/publish/$TARGET_LABEL/$TARGET_ARCHIVE -C $STARTDIR/build/out .
 
 if [[ $TARGET_PUBLISH == 'publish' ]]; then
 	$AWSCMD s3 cp publish/$TARGET_ARCHIVE s3://dronekit-sitl-binaries/$TARGET_LABEL/$TARGET_ARCHIVE --acl public-read

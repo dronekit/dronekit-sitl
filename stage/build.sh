@@ -102,6 +102,8 @@ if [[ $OSTYPE == cygwin* ]]; then
 fi
 
 (
+	set -e
+
 	cd $STARTDIR
 	if [[ ! -d env ]]; then
 		virtualenv env

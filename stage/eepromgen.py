@@ -28,6 +28,5 @@ for line in open(os.path.join(os.path.dirname(__file__), 'build/out/default.parm
 vehicle.flush()
 time.sleep(15)
 vehicle.close()
-s.p.kill()
 
 print 'eeprom generated.'

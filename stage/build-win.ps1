@@ -1,8 +1,3 @@
-param(
-[Parameter(Mandatory=$true)][String]$label,
-[Parameter(Mandatory=$true)][String]$classname,
-[Parameter(Mandatory=$true)][String]$version)
-
 $ErrorActionPreference = "Stop"
 
 $CYG_ROOT = 'C:\cygwin'
@@ -19,4 +14,5 @@ if ( -Not ( Test-Path $CYG_BASH )) {
 	cd $STARTDIR
 }
 
-& $CYG_BASH .\build-win-cygwin.sh $label $classname $version
+# Pass all arguments to build script
+& $CYG_BASH .\build.sh @psBoundParameters

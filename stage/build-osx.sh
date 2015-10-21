@@ -48,6 +48,10 @@ buildit || buildit || buildit
 
 cp $STAGING/$TARGET_ARDU.elf . || true
 cp $STARTDIR/build/ardupilot/$TARGET_ARDU/$TARGET_ARDU.elf $STARTDIR/build/out/apm
+
+# Tools/autotest/copter_params.parm
+# Tools/autotest/Rover.parm
+# Tools/autotest/ArduPlane.parm
 cp $STARTDIR/build/ardupilot/Tools/autotest/copter_params.parm $STARTDIR/build/out/default.parm
 
 cd $STARTDIR

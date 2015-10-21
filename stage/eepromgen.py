@@ -2,6 +2,7 @@ import os
 import dronekit
 import time
 import re
+import sys
 from dronekit_sitl import SITL
 
 s = SITL(path=os.path.join(os.path.dirname(__file__), 'build/out/apm'))
@@ -19,7 +20,7 @@ for line in open(os.path.join(os.path.dirname(__file__), 'build/out/default.parm
         import traceback
         traceback.print_exc()
 vehicle.flush()
-time.sleep(10)
+time.sleep(5)
 vehicle.close()
 s.p.kill()
 

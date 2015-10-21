@@ -24,7 +24,7 @@ from threading import Thread
 from Queue import Queue, Empty
 import dronekit
 
-sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
+sitl_host = 'http://dronekit-assets.s3.amazonaws.com/sitl'
 sitl_target = os.path.normpath(os.path.expanduser('~/.dronekit/sitl'))
 
 def kill(proc_pid):

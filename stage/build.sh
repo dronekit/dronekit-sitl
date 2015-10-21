@@ -37,7 +37,7 @@ else
 	# LINUX
 	echo 'os: linux'
 
-	# sudo apt-get install -y gcc-arm-linux-gnueabi make gawk gcc-4.8 g++-4.8
+	# sudo apt-get install -y gcc-arm-linux-gnueabi make gawk gcc-4.8 g++-4.8 python-dev
 	# sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-4.8 50
 	# sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-4.8 50
 	# sudo pip install awscli virtualenv
@@ -102,12 +102,10 @@ fi
 	cd $STARTDIR
 	if [[ ! -d env ]]; then
 		virtualenv env
-		source ./env/bin/activate
-		pip install "$STARTDIR/.." -UI --no-cache-dir
-		deactivate
 	fi
 	source ./env/bin/activate
-	python -c "import dronekit; print(dir(dronekit))"
+	pip install "$STARTDIR/.." -U --no-cache-dir
+
 	python eepromgen.py
 	cp $STARTDIR/build/test/eeprom.bin $STARTDIR/build/out/
 	python eepromtest.py || exit 1

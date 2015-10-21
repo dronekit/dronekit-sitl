@@ -25,5 +25,10 @@ setup(name='dronekit_sitl',
 
 # Delete home dir scripts for fresh install, just in case.
 import shutil
+import os
 sitl_target = os.path.normpath(os.path.expanduser('~/.dronekit/sitl'))
-shutil.rmtree(sitl_target)
+try:
+  shutil.rmtree(sitl_target)
+  print 'Cleared cached SITL binaries.'
+except:
+  pass

@@ -26,7 +26,7 @@ for line in open(os.path.join(os.path.dirname(__file__), 'build/out/default.parm
         traceback.print_exc()
 
 vehicle.flush()
-time.sleep(5)
+time.sleep(15)
 vehicle.close()
 s.p.kill()
 

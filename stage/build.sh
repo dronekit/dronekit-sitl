@@ -103,8 +103,12 @@ fi
 	if [[ ! -d env ]]; then
 		virtualenv env
 	fi
-	source ./env/bin/activate
-	pip install "$STARTDIR/.." -U --no-cache-dir
+	if [[ $OSTYPE == cygwin* ]]; then
+		source ./env/Scripts/activate
+	else
+		source ./env/bin/activate
+	fi
+	pip install ../ -U --no-cache-dir
 
 	python eepromgen.py
 	cp $STARTDIR/build/test/eeprom.bin $STARTDIR/build/out/

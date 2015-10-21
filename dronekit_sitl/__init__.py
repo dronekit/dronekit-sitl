@@ -120,11 +120,7 @@ class SITL():
         if target == None:
             target = detect_target()
 
-        if target == 'win':
-            exe = 'apm.exe'
-        else:
-            exe = 'apm'
-        self.path = os.path.join(os.path.join(os.path.join(sitl_target, system + '-' + version), exe))
+        self.path = os.path.join(os.path.join(os.path.join(sitl_target, system + '-' + version), 'apm'))
 
         return download(system, version, target, verbose=verbose)
 
@@ -132,7 +128,10 @@ class SITL():
         if not self.path:
             raise Exception('No path specified for SITL instance.')
         if not os.path.exists(self.path):
-            raise Exception('SITL binary %s does not exist.' % self.path)
+            if os.path.exists(self.path + '.exe'):
+                self.path = self.path + '.exe'
+            else:
+                raise Exception('SITL binary %s does not exist.' % self.path)
 
         if self.p and self.poll() == None:
             if not restart:

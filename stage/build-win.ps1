@@ -15,4 +15,4 @@ if ( -Not ( Test-Path $CYG_BASH )) {
 }
 
 # Pass all arguments to build script
-& $CYG_BASH .\build.sh @psBoundParameters
+& $CYG_BASH .\build.sh $args

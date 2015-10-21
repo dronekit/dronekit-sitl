@@ -26,5 +26,3 @@ for target, versions in data.iteritems():
             if err:
                 print('error, stopping on', target, version)
                 sys.exit(1)
-
-# Upload???

@@ -153,9 +153,9 @@ class SITL():
         if not any(x.startswith('--home') for x in args):
             args.append('--home=-35.363261,149.165230,584,353')
         if not any(x.startswith('--model') for x in args):
-            if 'APMrover2' in elf:
+            if 'ardupilot/APMrover2' in elf:
                 args.append('--model=rover')
-            elif 'ArduPlane' in elf:
+            elif 'ardupilot/ArduPlane' in elf:
                 args.append('--model=quad')
             else:
                 args.append('--model=quad')

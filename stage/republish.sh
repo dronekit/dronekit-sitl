@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [[ $OSTYPE == cygwin* ]]; then
-	AWSCMD="aws.exe"
+	AWSCMD="aws.cmd"
 else
 	AWSCMD="aws"
 fi

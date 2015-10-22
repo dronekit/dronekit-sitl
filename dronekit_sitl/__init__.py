@@ -210,6 +210,12 @@ class SITL():
         if verbose:
             print('Execute:', ' '.join([self.path] + args))
 
+        # Copy default eeprom into this dir.
+        try:
+            shutil.copy2(os.path.join(os.path.dirname(self.path), 'default_eeprom.bin'), os.path.join(wd, 'eeprom.bin'))
+        except:
+            pass
+
         # # Change CPU core affinity.
         # # TODO change affinity on osx/linux
         # if sys.platform == 'win32':

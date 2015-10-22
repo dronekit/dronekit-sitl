@@ -89,7 +89,6 @@ buildit () {
 # Thrice is nice. Works around build bugs in ArduCopter 3.2.x
 buildit || buildit || buildit
 
-cp /tmp/$TARGET_ARDU.build/$TARGET_ARDU.elf . || true
 cp $STARTDIR/build/ardupilot/$TARGET_ARDU/$TARGET_ARDU.elf $STARTDIR/build/out/$BINNAME
 strip $STARTDIR/build/out/$BINNAME
 

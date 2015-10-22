@@ -1,9 +1,6 @@
 {
   "copter": {
     "stable": "3.3",
-    "3.2.1": {
-      "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-copter-3.2.1.tar.gz"
-    },
     "3.3": {
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-copter-3.3.tar.gz"
     }

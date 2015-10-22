@@ -4,8 +4,8 @@ from nose.tools import assert_equals
 copter_args = ['-I0', '-S', '--model', 'quad', '--home=-35.363261,149.165230,584,353']
 
 def test_sitl():
-    sitl = SITL('copter', '3.3-rc5')
-    sitl.download()
+    sitl = SITL()
+    sitl.download('copter', '3.3')
     sitl.launch(copter_args)
     sitl.block_until_ready()
     

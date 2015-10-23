@@ -119,6 +119,9 @@ class SITL():
         if target == None:
             target = detect_target()
 
+        if version == 'stable':
+            version = version_list()[system]['stable']
+
         self.path = os.path.join(os.path.join(os.path.join(sitl_target, system + '-' + version), 'apm'))
 
         return download(system, version, target, verbose=verbose)
@@ -332,7 +335,8 @@ def main(args=None):
             keys = [k for k, v in versions[system].iteritems()]
             keys.sort()
             for k in keys:
-                print(system + '-' + k)
+                if k != 'stable':
+                    print(system + '-' + k)
         sys.exit(0)
 
     if len(args) > 0 and (args[0] == '--version' or args[0] == '-v'):
@@ -367,18 +371,30 @@ def main(args=None):
 
     binpath = args[0]
     args = args[1:]
-    if re.match(r'^copter-v?(.+)', binpath):
+    if re.match(r'^copter(-v?(.+)|$)', binpath):
         system = 'copter'
-        version = re.match(r'^copter-v?(.+)', binpath).group(1)
-    if re.match(r'^plane-v?(.+)', binpath):
+        try:
+            version = re.match(r'^copter-v?(.+)', binpath).group(1)
+        except:
+            version = 'stable'
+    if re.match(r'^plane(-v?(.+)|$)', binpath):
         system = 'plane'
-        version = re.match(r'^plane-v?(.+)', binpath).group(1)
-    if re.match(r'^solo-v?(.+)', binpath):
+        try:
+            version = re.match(r'^plane-v?(.+)', binpath).group(1)
+        except:
+            version = 'stable'
+    if re.match(r'^solo(-v?(.+)|$)', binpath):
         system = 'solo'
-        version = re.match(r'^solo-v?(.+)', binpath).group(1)
-    if re.match(r'^rover-v?(.+)', binpath):
+        try:
+            version = re.match(r'^solo-v?(.+)', binpath).group(1)
+        except:
+            version = 'stable'
+    if re.match(r'^rover(-v?(.+)|$)', binpath):
         system = 'rover'
-        version = re.match(r'^rover-v?(.+)', binpath).group(1)
+        try:
+            version = re.match(r'^rover-v?(.+)', binpath).group(1)
+        except:
+            version = 'stable'
     local = re.match(r'^[./]|:', binpath)
 
     if local:

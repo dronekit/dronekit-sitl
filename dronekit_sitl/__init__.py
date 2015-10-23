@@ -87,6 +87,15 @@ def version_list():
 def download(system, version, target, verbose=False):
     sitl_file = "{}/{}/sitl-{}-{}-{}.tar.gz".format(sitl_host, system, target, system, version)
 
+    # Delete old directories from legacy SITL.
+    if os.path.isdir(sitl_target + '/' + system + '-' + version):
+        if not (os.path.isfile(sitl_target + '/' + system + '-' + version + '/apm') or os.path.isfile(sitl_target + '/' + system + '-' + version + '/apm.exe')):
+            try:
+                shutil.rmtree(sitl_target + '/' + system + '-' + version)
+                print('Removing legacy SITL build...')
+            except:
+                pass
+
     if not os.path.isdir(sitl_target + '/' + system + '-' + version):
         if verbose:
             print("Downloading SITL from %s" % sitl_file)

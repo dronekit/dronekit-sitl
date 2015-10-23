@@ -50,14 +50,14 @@ The ``-h`` *parameter* can be passed in the command above to list all the parame
 
 ## Examples
 
-The following command might be used to start SITL for build of ``copter-3.3-rc5``:
+The following command might be used to start SITL for build of `copter-3.3`:
 
 ```
-dronekit-sitl copter-3.3-rc5 -I0 -S --model quad --home=-35.363261,149.165230,584,353
+dronekit-sitl copter-3.3 -I0 --model quad --home=-35.363261,149.165230,584,353
 ```
 
-SITL starts and waits for TCP connections on ``127.0.0.1:5760``. In a second terminal you can spawn an instance of MAVProxy to
-forward messages to UDP ports ``127.0.0.1:14550`` and ``127.0.0.1:14551`` (in the same way as **sim_vehicle.sh**):
+SITL starts and waits for TCP connections on `127.0.0.1:5760`. In a second terminal you can spawn an instance of MAVProxy to
+forward messages to UDP ports `127.0.0.1:14550` and `127.0.0.1:14551` (in the same way as **sim_vehicle.sh**):
 
 ```
 mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14550 --out 127.0.0.1:14551
@@ -70,9 +70,10 @@ We are providing hosting for some pre-compiled Ardupilot Copter, Plane and Rover
 
 | Platform | List |
 |------|----|
-| Copter | <http://dronekit-sitl-binaries.s3-website-us-east-1.amazonaws.com/copter/> |
-| Plane | <http://dronekit-sitl-binaries.s3-website-us-east-1.amazonaws.com/plane/> |
-| Rover | <http://dronekit-sitl-binaries.s3-website-us-east-1.amazonaws.com/rover/> |
+| Copter | <http://dronekit-assets.s3-website-us-east-1.amazonaws.com/sitl/copter/> |
+| Plane | <http://dronekit-assets.s3-website-us-east-1.amazonaws.com/sitl/plane/> |
+| Rover | <http://dronekit-assets.s3-website-us-east-1.amazonaws.com/sitl/rover/> |
+| Solo | <http://dronekit-assets.s3-website-us-east-1.amazonaws.com/sitl/solo/> |
 
 
 ## API
@@ -81,9 +82,9 @@ SITL exposes a Python API for managing a SITL instance.
 
 ```
 from dronekit_sitl import SITL
-sitl = SITL(system, version) # launch system (e.g. "copter") and version (e.g. "3.3")
-sitl.download(target, verbose=False) # explicitly download version
-sitl.launch(args, verbose=False, auto_download=True, await_ready=False, restart=False)
+sitl = SITL(path=apm) # load a binary path (optional)
+sitl.download(system, version, verbose=False) # ...or download system (e.g. "copter") and version (e.g. "3.3")
+sitl.launch(args, verbose=False, await_ready=False, restart=False)
 sitl.block_until_ready(verbose=False) # explicitly wait until receiving commands
 code = sitl.complete(verbose=False) # wait until exit
 sitl.poll() # returns None or return code

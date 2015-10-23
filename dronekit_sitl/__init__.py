@@ -335,6 +335,11 @@ def main(args=None):
                 print(system + '-' + k)
         sys.exit(0)
 
+    if len(args) > 0 and (args[0] == '--version' or args[0] == '-v'):
+        import pkg_resources
+        print(pkg_resources.get_distribution(sys.modules[__name__].__package__).version)
+        sys.exit(0)
+
     if len(args) > 0 and args[0] == '--help':
         print('You can look up help for a particular vehicle, e.g.:', file=sys.stderr)
         print('  dronekit-sitl copter --help')

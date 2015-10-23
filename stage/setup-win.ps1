@@ -1,8 +1,3 @@
-param(
-[Parameter(Mandatory=$true)][String]$label,
-[Parameter(Mandatory=$true)][String]$classname,
-[Parameter(Mandatory=$true)][String]$version)
-
 $ErrorActionPreference = "Stop"
 
 $CYG_ROOT = 'C:\cygwin'
@@ -18,5 +13,3 @@ if ( -Not ( Test-Path $CYG_BASH )) {
 	cygcheck -dc cygwin | Write-Output
 	cd $STARTDIR
 }
-
-& $CYG_BASH .\cygwin.sh $label $classname $version

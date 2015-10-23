@@ -18,14 +18,14 @@ import shutil
 import atexit
 import select
 import psutil
+import tempfile
 from subprocess import Popen, PIPE
-from os.path import expanduser
 from threading import Thread
 from Queue import Queue, Empty
 import dronekit
 
-sitl_host = 'http://d3jdmgrrydviou.cloudfront.net'
-sitl_target = os.path.normpath(expanduser('~/.dronekit/sitl'))
+sitl_host = 'http://dronekit-assets.s3.amazonaws.com/sitl'
+sitl_target = os.path.normpath(os.path.expanduser('~/.dronekit/sitl'))
 
 def kill(proc_pid):
     process = psutil.Process(proc_pid)
@@ -85,7 +85,7 @@ def version_list():
     return versions
 
 def download(system, version, target, verbose=False):
-    sitl_file = "{}/{}/sitl-{}-v{}.tar.gz".format(sitl_host, system, target, version)
+    sitl_file = "{}/{}/sitl-{}-{}-{}.tar.gz".format(sitl_host, system, target, system, version)
 
     if not os.path.isdir(sitl_target + '/' + system + '-' + version):
         if verbose:
@@ -108,50 +108,60 @@ def download(system, version, target, verbose=False):
             print("SITL already Downloaded.")
 
 class SITL():
-    def __init__(self, system, version):
-        self.system = system
-        self.version = version
+    def __init__(self, path=None):
+        if path:
+            self.path = os.path.realpath(path)
+        else:
+            self.path = None
         self.p = None
 
-    def download(self, target=None, verbose=False):
+    def download(self, system, version, target=None, verbose=False):
         if target == None:
             target = detect_target()
 
-        return download(self.system, self.version, target, verbose=verbose)
+        if version == 'stable':
+            version = version_list()[system]['stable']
 
-    def launch(self, args, auto_download=True, verbose=False, await_ready=False, restart=False, local=False):
+        self.path = os.path.join(os.path.join(os.path.join(sitl_target, system + '-' + version), 'apm'))
+
+        return download(system, version, target, verbose=verbose)
+
+    def launch(self, args, verbose=False, await_ready=False, restart=False, wd=None):
+        if not self.path:
+            raise Exception('No path specified for SITL instance.')
+        if not os.path.exists(self.path):
+            if os.path.exists(self.path + '.exe'):
+                self.path = self.path + '.exe'
+            else:
+                raise Exception('SITL binary %s does not exist.' % self.path)
+
         if self.p and self.poll() == None:
             if not restart:
-                raise ChildProcessError('SITL is already running, please use .stop() to kill it')
+                raise ChildProcessError('SITL is already running in this process, please use .stop() to kill it')
             self.stop()
 
-        if auto_download:
-            self.download()
-
-        elfname = {
-            "copter": "ArduCopter.elf",
-            "plane": "ArduPlane.elf",
-            "rover": "APMrover2.elf",
-            "solo": "ArduCopter.elf",
-        }
-
-        if local:
-            wd = os.getcwd()
-        else:
-            wd = os.path.join(sitl_target, self.system + '-' + self.version)
-
-        if not local:
-            args = [os.path.join('.', elfname[self.system])] + args
-        else:
-            args = [os.path.join('.', args[0])] + args[1:]
+        if not wd:
+            wd = tempfile.mkdtemp()
 
         # Load the binary for primitive feature detection.
-        elf = open(os.path.join(wd, args[0]), 'rb').read()
+        elf = open(self.path, 'rb').read()
 
         # pysim is required for earlier SITL builds
         # lacking --home or --model params.
         need_sim = not '--home' in elf or not '--model' in elf
         self.using_sim = need_sim
+
+        # Defaults stabilizes SITL emulation.
+        # https://github.com/dronekit/dronekit-sitl/issues/34
+        if not any(x.startswith('--home') for x in args):
+            args.append('--home=-35.363261,149.165230,584,353')
+        if not any(x.startswith('--model') for x in args):
+            if 'ardupilot/APMrover2' in elf:
+                args.append('--model=rover')
+            elif 'ardupilot/ArduPlane' in elf:
+                args.append('--model=quad')
+            else:
+                args.append('--model=quad')
 
         # Run pysim
         if need_sim:
@@ -166,14 +176,14 @@ class SITL():
                 pass
 
             parser.error = noop
-            out = parser.parse_known_args(args[1:])
+            out = parser.parse_known_args(args[:])
             if out == None:
                 print('Warning! Couldn\'t recognize arguments passed to legacy SITL.', file=sys.stderr)
             else:
                 res, rest = out
 
                 # Fixup actual args.
-                args = [args[0]]
+                args = [self.path]
                 if res.I:
                     args += ['-I' + res.I]
                 if res.C:
@@ -201,7 +211,13 @@ class SITL():
                     print('Pysim:', ' '.join((simargs)))
 
         if verbose:
-            print('Execute:', ' '.join((args)))
+            print('Execute:', ' '.join([self.path] + args))
+
+        # Copy default eeprom into this dir.
+        try:
+            shutil.copy2(os.path.join(os.path.dirname(self.path), 'default_eeprom.bin'), os.path.join(wd, 'eeprom.bin'))
+        except:
+            pass
 
         # # Change CPU core affinity.
         # # TODO change affinity on osx/linux
@@ -211,13 +227,7 @@ class SITL():
         # else:
         #     sitl = Popen(sitl_args, stdout=PIPE, stderr=PIPE)
 
-        # Attempt to delete eeprom.bin
-        try:
-            os.remove(os.path.join(wd, 'eeprom.bin'))
-        except:
-            pass
-
-        p = Popen(args, cwd=wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
+        p = Popen([self.path] + args, cwd=wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
         self.p = p
 
         def cleanup():
@@ -229,22 +239,6 @@ class SITL():
 
         self.stdout = NonBlockingStreamReader(p.stdout)
         self.stderr = NonBlockingStreamReader(p.stderr)
-
-        # Run dronekit
-        if need_sim:
-            time.sleep(0.5)
-            vehicle = dronekit.connect('tcp:127.0.0.1:5760')
-            for line in open(os.path.join(os.path.dirname(__file__), 'defaults.parm')):
-                if re.match(r'^\s*#', line):
-                    continue
-                try:
-                    pname, pvalue = line.split()
-                    vehicle.parameters.set(pname, float(pvalue), retries=0)
-                except Exception as e:
-                    import traceback
-                    traceback.print_exc()
-            vehicle.flush()
-            vehicle.close()
 
         if await_ready:
             self.block_until_ready(verbose=verbose)
@@ -330,13 +324,6 @@ def main(args=None):
                 else:
                     i += 1
 
-    # Defaults stabilizes SITL emulation.
-    # https://github.com/dronekit/dronekit-sitl/issues/34
-    if not any(x.startswith('--home') for x in args):
-        args.append('--home=-35.363261,149.165230,584,353')
-    if not any(x.startswith('--model') for x in args):
-        args.append('--model=quad')
-
     system = 'copter'
     target = detect_target()
     version = '3.2.1'
@@ -348,7 +335,13 @@ def main(args=None):
             keys = [k for k, v in versions[system].iteritems()]
             keys.sort()
             for k in keys:
-                print(system + '-' + k)
+                if k != 'stable':
+                    print(system + '-' + k)
+        sys.exit(0)
+
+    if len(args) > 0 and (args[0] == '--version' or args[0] == '-v'):
+        import pkg_resources
+        print(pkg_resources.get_distribution(sys.modules[__name__].__package__).version)
         sys.exit(0)
 
     if len(args) > 0 and args[0] == '--help':
@@ -362,39 +355,57 @@ def main(args=None):
         sys.exit(0)
 
     if len(args) > 0 and args[0] == '--local':
-        local = True
+        print('--local no longer needed. Specify an absolute or relative file path.')
+        sys.exit(1)
 
-    if len(args) < 1 or not re.match(r'^(copter|plane|solo|rover)(-v?.+)?', args[0]) and not local:
+    if len(args) < 1 or not re.match(r'^(copter|plane|solo|rover)(-v?.+)?|^[./]|:', args[0]) and not local:
         print('Please specify one of:', file=sys.stderr)
         print('  dronekit-sitl --list', file=sys.stderr)
         print('  dronekit-sitl --reset', file=sys.stderr)
-        print('  dronekit-sitl <copter(-version)>', file=sys.stderr)
-        print('  dronekit-sitl <plane(-version)>', file=sys.stderr)
-        print('  dronekit-sitl <rover(-version)>', file=sys.stderr)
-        print('  dronekit-sitl <solo(-version)>', file=sys.stderr)
+        print('  dronekit-sitl <copter(-version)> [args...]', file=sys.stderr)
+        print('  dronekit-sitl <plane(-version)> [args...]', file=sys.stderr)
+        print('  dronekit-sitl <rover(-version)> [args...]', file=sys.stderr)
+        print('  dronekit-sitl <solo(-version)> [args...]', file=sys.stderr)
+        print('  dronekit-sitl ./path [args...]', file=sys.stderr)
         sys.exit(1)
 
-    if re.match(r'^copter-v?(.+)', args[0]):
-        system = 'copter'
-        version = re.match(r'^copter-v?(.+)', args[0]).group(1)
-    if re.match(r'^plane-v?(.+)', args[0]):
-        system = 'plane'
-        version = re.match(r'^plane-v?(.+)', args[0]).group(1)
-    if re.match(r'^solo-v?(.+)', args[0]):
-        system = 'solo'
-        version = re.match(r'^solo-v?(.+)', args[0]).group(1)
-    if re.match(r'^rover-v?(.+)', args[0]):
-        system = 'rover'
-        version = re.match(r'^rover-v?(.+)', args[0]).group(1)
+    binpath = args[0]
     args = args[1:]
+    if re.match(r'^copter(-v?(.+)|$)', binpath):
+        system = 'copter'
+        try:
+            version = re.match(r'^copter-v?(.+)', binpath).group(1)
+        except:
+            version = 'stable'
+    if re.match(r'^plane(-v?(.+)|$)', binpath):
+        system = 'plane'
+        try:
+            version = re.match(r'^plane-v?(.+)', binpath).group(1)
+        except:
+            version = 'stable'
+    if re.match(r'^solo(-v?(.+)|$)', binpath):
+        system = 'solo'
+        try:
+            version = re.match(r'^solo-v?(.+)', binpath).group(1)
+        except:
+            version = 'stable'
+    if re.match(r'^rover(-v?(.+)|$)', binpath):
+        system = 'rover'
+        try:
+            version = re.match(r'^rover-v?(.+)', binpath).group(1)
+        except:
+            version = 'stable'
+    local = re.match(r'^[./]|:', binpath)
 
-    print('os: %s, apm: %s, release: %s' % (target, system, version))
+    if local:
+        print('os: %s, local binary: %s' % (target, binpath))
+        sitl = SITL(path=binpath)
+    else:
+        print('os: %s, apm: %s, release: %s' % (target, system, version))
+        sitl = SITL()
+        sitl.download(system, version, target=target, verbose=True)
 
-    sitl = SITL(system, version)
-    if not local:
-        sitl.download(target, verbose=True)
-
-    sitl.launch(args, verbose=True, local=local)
+    sitl.launch(args, verbose=True)
     # sitl.block_until_ready(verbose=True)
     code = sitl.complete(verbose=True)
 

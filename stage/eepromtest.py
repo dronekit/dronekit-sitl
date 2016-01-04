@@ -31,7 +31,7 @@ messages = False
 def logme(*args):
     global messages
     messages = True
-vehicle.on_message('*', logme)
+vehicle.add_message_listener('*', logme)
 start = time.time()
 while not messages and time.time() - start < 15:
     time.sleep(.1)

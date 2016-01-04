@@ -27,6 +27,7 @@ List of available commands:
   dronekit-sitl <plane(-version)> [parameters]
   dronekit-sitl <rover(-version)> [parameters]
   dronekit-sitl <solo(-version)> [parameters]
+  dronekit-sitl /path/to/local/binary [parameters]
 ```
 
 The ``--list`` commmand is used to display the available build versions (e.g. `copter-3.4-dev`).

@@ -53,7 +53,7 @@ The ``-h`` *parameter* can be passed in the command above to list all the parame
 The following command might be used to start SITL for build of `copter-3.3`:
 
 ```
-dronekit-sitl copter-3.3 -I0 --model quad --home=-35.363261,149.165230,584,353
+dronekit-sitl copter-3.3 --home=-35.363261,149.165230,584,353
 ```
 
 SITL starts and waits for TCP connections on `127.0.0.1:5760`. In a second terminal you can spawn an instance of MAVProxy to

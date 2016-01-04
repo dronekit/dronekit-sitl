@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
 from __future__ import print_function
+import six
 import re
 import sys
 import os
@@ -10,8 +11,8 @@ import time
 import json
 import tarfile
 import sys
-import urllib
-import urllib2
+#import urllib
+#import urllib2
 import os
 import json
 import shutil
@@ -21,8 +22,9 @@ import psutil
 import tempfile
 from subprocess import Popen, PIPE
 from threading import Thread
-from Queue import Queue, Empty
-import dronekit
+from six.moves.queue import Queue, Empty
+#from Queue import Queue, Empty
+#import dronekit
 
 sitl_host = 'http://dronekit-assets.s3.amazonaws.com/sitl'
 sitl_target = os.path.normpath(os.path.expanduser('~/.dronekit/sitl'))
@@ -79,8 +81,20 @@ class UnexpectedEndOfStream(Exception):
 def version_list():
     sitl_list = '{}/versions.json'.format(sitl_host)
 
-    req = urllib2.Request(sitl_list, headers={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'})
-    raw = urllib2.urlopen(req).read()
+    if six.PY3:
+        import urllib.request
+        _Request = urllib.request.Request
+        _urlopen = urllib.request.urlopen
+    else:
+        import urllib2
+        _Request = urllib2.Request
+        _urlopen = urllib2.urlopen
+    req = _Request(sitl_list, headers={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'})
+    raw = _urlopen(req).read()
+
+    if six.PY3:
+        raw = raw.decode('utf-8')
+
     versions = json.loads(raw)
     return versions
 
@@ -103,7 +117,14 @@ def download(system, version, target, verbose=False):
         if not os.path.isdir(sitl_target):
             os.makedirs(sitl_target)
 
-        testfile = urllib.URLopener()
+        if six.PY3:
+            import urllib.request
+            _URLopener = urllib.request.URLopener
+        else:
+            import urllib
+            _URLopener = urllib.URLopener
+
+        testfile = _URLopener()
         testfile.retrieve(sitl_file, sitl_target + '/sitl.tar.gz')
 
         tar = tarfile.open(sitl_target + '/sitl.tar.gz')
@@ -160,7 +181,7 @@ class SITL():
 
         # pysim is required for earlier SITL builds
         # lacking --home or --model params.
-        need_sim = not '--home' in elf or not '--model' in elf
+        need_sim = not b'--home' in elf or not b'--model' in elf
         self.using_sim = need_sim
 
         # Defaults stabilizes SITL emulation.
@@ -269,7 +290,7 @@ class SITL():
             line = self.stdout.readline(0.01)
             if line and verbose:
                 sys.stdout.write(line)
-            if line and 'Waiting for connection' in line:
+            if line and b'Waiting for connection' in line:
                 break
 
             line = self.stderr.readline(0.01)

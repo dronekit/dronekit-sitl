@@ -5,15 +5,15 @@ import time
 import re
 from dronekit_sitl import SITL
 
-print 'launching SITL...'
+print('launching SITL...')
 s = SITL(path=os.path.join(os.path.dirname(__file__), 'build/out/apm'))
 s.launch([], wd=os.path.join(os.path.dirname(__file__), 'build/test'), verbose=True)
 
-print 'connecting...'
+print('connecting...')
 time.sleep(1)
 vehicle = dronekit.connect('tcp:127.0.0.1:5760')
 
-print 'waiting a fair amount of time...'
+print('waiting a fair amount of time...')
 start = time.time()
 while time.time() - start < 10:
     time.sleep(.1)
@@ -26,7 +26,7 @@ while time.time() - start < 10:
     if line:
         sys.stderr.write(line)
 
-print 'checking for messages...'
+print('checking for messages...')
 messages = False
 def logme(*args):
     global messages
@@ -37,7 +37,7 @@ while not messages and time.time() - start < 15:
     time.sleep(.1)
 
 if not messages:
-    print 'did not receive any output'
+    print('did not receive any output')
     sys.exit(1)
 else:
-    print 'success!'
+    print('success!')

@@ -11,6 +11,7 @@ setup(name='dronekit_sitl',
       install_requires = [
         'psutil>=3.0',
         'dronekit>=2.0.0b6',
+        'six>=1.10'
       ],
       package_data={
         'dronekit_sitl': ['*.parm'],
@@ -29,6 +30,6 @@ import os
 sitl_target = os.path.normpath(os.path.expanduser('~/.dronekit/sitl'))
 try:
   shutil.rmtree(sitl_target)
-  print 'Cleared cached SITL binaries.'
+  print('Cleared cached SITL binaries.')
 except:
   pass

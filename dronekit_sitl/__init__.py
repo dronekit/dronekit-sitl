@@ -129,7 +129,10 @@ class SITL():
             target = detect_target()
 
         if version == 'stable':
-            version = version_list()[system]['stable']
+            try:
+                version = version_list()[system]['stable']
+            except:
+                raise Exception('Cannot connect to version list. Please specify a specific version to continue.')
 
         self.path = os.path.join(os.path.join(os.path.join(sitl_target, system + '-' + version), 'apm'))
 

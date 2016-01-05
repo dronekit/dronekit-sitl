@@ -11,8 +11,7 @@ import time
 import json
 import tarfile
 import sys
-#import urllib
-#import urllib2
+from six.moves.urllib.request import URLopener, Request, urlopen
 import os
 import json
 import shutil
@@ -23,8 +22,7 @@ import tempfile
 from subprocess import Popen, PIPE
 from threading import Thread
 from six.moves.queue import Queue, Empty
-#from Queue import Queue, Empty
-#import dronekit
+
 
 sitl_host = 'http://dronekit-assets.s3.amazonaws.com/sitl'
 sitl_target = os.path.normpath(os.path.expanduser('~/.dronekit/sitl'))
@@ -81,16 +79,8 @@ class UnexpectedEndOfStream(Exception):
 def version_list():
     sitl_list = '{}/versions.json'.format(sitl_host)
 
-    if six.PY3:
-        import urllib.request
-        _Request = urllib.request.Request
-        _urlopen = urllib.request.urlopen
-    else:
-        import urllib2
-        _Request = urllib2.Request
-        _urlopen = urllib2.urlopen
-    req = _Request(sitl_list, headers={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'})
-    raw = _urlopen(req).read()
+    req = Request(sitl_list, headers={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'})
+    raw = urlopen(req).read()
 
     if six.PY3:
         raw = raw.decode('utf-8')
@@ -117,14 +107,7 @@ def download(system, version, target, verbose=False):
         if not os.path.isdir(sitl_target):
             os.makedirs(sitl_target)
 
-        if six.PY3:
-            import urllib.request
-            _URLopener = urllib.request.URLopener
-        else:
-            import urllib
-            _URLopener = urllib.URLopener
-
-        testfile = _URLopener()
+        testfile = URLopener()
         testfile.retrieve(sitl_file, sitl_target + '/sitl.tar.gz')
 
         tar = tarfile.open(sitl_target + '/sitl.tar.gz')
@@ -189,9 +172,9 @@ class SITL():
         if not any(x.startswith('--home') for x in args):
             args.append('--home=-35.363261,149.165230,584,353')
         if not any(x.startswith('--model') for x in args):
-            if 'ardupilot/APMrover2' in elf:
+            if b'ardupilot/APMrover2' in elf:
                 args.append('--model=rover')
-            elif 'ardupilot/ArduPlane' in elf:
+            elif b'ardupilot/ArduPlane' in elf:
                 args.append('--model=quad')
             else:
                 args.append('--model=quad')
@@ -289,13 +272,13 @@ class SITL():
         while self.poll() == None:
             line = self.stdout.readline(0.01)
             if line and verbose:
-                sys.stdout.write(line)
+                sys.stdout.write(line.decode(sys.getdefaultencoding()) if six.PY3 else line)
             if line and b'Waiting for connection' in line:
                 break
 
             line = self.stderr.readline(0.01)
             if line and verbose:
-                sys.stderr.write(line)
+                sys.stderr.write(line.decode(sys.getdefaultencoding()) if six.PY3 else line)
 
         return self.poll()
 
@@ -305,11 +288,11 @@ class SITL():
 
             out = self.stdout.readline(0.01)
             if out and verbose:
-                sys.stdout.write(out)
+                sys.stdout.write(out.decode(sys.getdefaultencoding()) if six.PY3 else out)
 
             err = self.stderr.readline(0.01)
             if err and verbose:
-                sys.stderr.write(err)
+                sys.stderr.write(err.decode(sys.getdefaultencoding()) if six.PY3 else err)
 
             if not out and not err and alive != None:
                 break
@@ -364,8 +347,8 @@ def main(args=None):
 
     if len(args) > 0 and args[0] == '--list':
         versions = version_list()
-        for system in [system for system, v in versions.iteritems()]:
-            keys = [k for k, v in versions[system].iteritems()]
+        for system in [system for system, v in versions.items()]:
+            keys = [k for k, v in versions[system].items()]
             keys.sort()
             for k in keys:
                 if k != 'stable':

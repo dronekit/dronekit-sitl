@@ -1,5 +1,5 @@
 from dronekit_sitl import SITL
-from nose.tools import assert_equals
+from nose.tools import assert_equals,assert_is_not_none
 
 copter_args = ['-I0', '-S', '--model', 'quad', '--home=-35.363261,149.165230,584,353']
 
@@ -28,3 +28,17 @@ def test_sitl():
     	assert False, 'SITL should succeed in launch() when restart=True'
 
     sitl.stop()
+
+def test_version_list():
+    from dronekit_sitl import version_list
+    versions = version_list()
+    assert_is_not_none(versions)
+    expected = [u'solo', u'plane', u'copter', u'rover']
+    expected.sort()
+    models = list(versions.keys())
+    models.sort()
+    assert_equals(expected, models)
+
+def test_download():
+    from dronekit_sitl import download
+    download('copter','3.3', None)

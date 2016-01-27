@@ -1,20 +1,33 @@
-# dronekit-sitl
+# DroneKit-SITL
 
-![PyPi published version](https://img.shields.io/pypi/v/dronekit-sitl.svg) [![Windows Build status](https://img.shields.io/appveyor/ci/3drobotics/dronekit-sitl.svg?label=windows)](https://ci.appveyor.com/project/3drobotics/dronekit-sitl/branch/master) [![OS X Build Status](https://img.shields.io/travis/dronekit/dronekit-sitl.svg?label=os%20x)](https://travis-ci.org/dronekit/dronekit-sitl) [![Linux Build Status](https://img.shields.io/circleci/project/dronekit/dronekit-sitl.svg?label=linux)](https://circleci.com/gh/dronekit/dronekit-sitl)
+![Logo](https://cloud.githubusercontent.com/assets/5368500/10805537/90dd4b14-7e22-11e5-9592-5925348a7df9.png)
+
+![PyPi published version](https://img.shields.io/pypi/v/dronekit-sitl.svg) [![Windows Build status](https://img.shields.io/appveyor/ci/3drobotics/dronekit-sitl.svg?label=windows)](https://ci.appveyor.com/project/3drobotics/dronekit-sitl/branch/master) [![OS X Build Status](https://img.shields.io/travis/dronekit/dronekit-sitl.svg?label=os%20x)](https://travis-ci.org/dronekit/dronekit-sitl) [![Linux Build Status](https://img.shields.io/circleci/project/dronekit/dronekit-sitl.svg?label=linux)](https://circleci.com/gh/dronekit/dronekit-sitl)<a href="https://discuss.dronekit.io/c/development"><img align="right" src="https://img.shields.io/badge/support-discuss.dronekit.io-blue.svg"></img></a>
+
+SITL Runner for DroneKit.
+
+## Overview
+
+The ArduPilot [SITL (Software In The Loop) simulator](http://dev.ardupilot.com/wiki/simulation-2/sitl-simulator-software-in-the-loop/) allows you to simulate an ArduPilot based autopilot and communicate with it using MAVLink over the local IP network. 
+
+DroneKit-SITL is the fastest and easiest way to run SITL on Windows, Linux, or MAC OSX. It is installed from Python’s pip tool on all platforms, and provides a few simple commands to run pre-built vehicle binaries that are appropriate for the host operating system (downloading them if needed). You can even use it to run binaries you've build locally.
+
+The tool is used extensively by DroneKit projects to test DroneKit apps and example code.
 
 ## Installing
 
 Install using pip (recommended):
 
 ```
-pip2 install dronekit-sitl -UI
+pip install dronekit-sitl
 ```
 
-Installing from github master:
+Installing from Github master:
 ```
-pip2 install git+https://github.com/dronekit/dronekit-sitl
+pip install git+https://github.com/dronekit/dronekit-sitl
 ```
 
+The `-UI` or `--upgrade --ignore-installed` flags can be added to the commands to update an existing installation to the latest version.
 
 ## Usage
 
@@ -65,9 +78,14 @@ mavproxy.py --master tcp:127.0.0.1:5760 --sitl 127.0.0.1:5501 --out 127.0.0.1:14
 ```
 
 
-## Ardupilot versions available:
+## Ardupilot versions available
 
-We are providing hosting for some pre-compiled Ardupilot Copter, Plane and Rover binaries
+You can get the available vehicle builds using the command:
+```bash
+dronekit-sitl --list
+```
+
+You can also view the pre-compiled Ardupilot Copter, Plane and Rover binaries at the links below:
 
 | Platform | List |
 |------|----|
@@ -98,3 +116,15 @@ sitl.stop() # terminates SITL
 dronekit-sitl is licensed as MIT, Apache-2.0, and GPLv3.
 
 pysim is licensed as GPLv3.
+
+
+## Resources
+
+* **Documentation:** 
+  * This page! 
+  * Dronekit-Python: [Setting up a Simulated Vehicle (SITL)](http://python.dronekit.io/develop/sitl_setup.html)
+* **Examples:** 
+  * [Example section above](#examples), 
+  * [DroneKit Python QuickStart](http://python.dronekit.io/guide/quick_start.html#basic-hello-drone)
+* **Open Issues:** [/dronekit-sitl/issues](https://github.com/dronekit/dronekit-sitl/issues)
+* **Forums:** [https://discuss.dronekit.io](https://discuss.dronekit.io/c/development)

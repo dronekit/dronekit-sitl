@@ -421,9 +421,12 @@ def main(args=None):
         sitl = SITL()
         sitl.download(system, version, target=target, verbose=True)
 
-    sitl.launch(args, verbose=True)
-    # sitl.block_until_ready(verbose=True)
-    code = sitl.complete(verbose=True)
+    try:
+        sitl.launch(args, verbose=True)
+        # sitl.block_until_ready(verbose=True)
+        code = sitl.complete(verbose=True)
 
-    if code != 0:
-        sys.exit(code)
+        if code != 0:
+            sys.exit(code)
+    except KeyboardInterrupt:
+        pass

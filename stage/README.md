@@ -1,16 +1,18 @@
-# building SITL
+# Building a new SITL image
 
-to build a local version:
+To build a new SITL version:
 
 ```
 ./build.sh solo 1.2.8
 ```
 
-where this is a file uploaded to https://github.com/tcr3dr/ardupilot-releases
+Where `builder-solo-1.2.8` is a tag uploaded to https://github.com/dronekit/ardupilot-releases.  This generates a file i.e. `stage/publish/solo/sitl-osx-solo-1.2.8.tar.gz`. Extract this file `~/.dronekit/sitl/solo-1.2.8` to use it.
 
-## publishers
+Remove the `stage/build` and `stage/publish` directories to clear your build data.
 
-for publishers, to rebuild ALL builds:
+## Publishers
+
+For publishers, to rebuild ALL builds from the `versions.json` (manually uploaded to S3 and tracked there):
 
 ```
 ./rebuild.py

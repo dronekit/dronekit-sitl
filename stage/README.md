@@ -6,7 +6,7 @@ To build a new SITL version:
 ./build.sh solo 1.2.8
 ```
 
-Where `builder-solo-1.2.8` is a tag uploaded to https://github.com/dronekit/ardupilot-releases.  This generates a file i.e. `stage/publish/solo/sitl-osx-solo-1.2.8.tar.gz`. Extract this file `~/.dronekit/sitl/solo-1.2.8` to use it.
+Where `builder-solo-1.2.8` is a tag uploaded to https://github.com/dronekit/ardupilot-releases.  This generates a file i.e. `stage/publish/solo/sitl-osx-solo-1.2.8.tar.gz`. Extract this archive to `~/.dronekit/sitl/solo-1.2.8` to use it: `dronekit-sitl solo-1.2.8`
 
 Remove the `stage/build` and `stage/publish` directories to clear your build data.
 

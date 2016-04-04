@@ -14,6 +14,8 @@ DroneKit-SITL is the fastest and easiest way to run SITL on Windows, Linux, or M
 
 The tool is used extensively by DroneKit projects to test DroneKit apps and example code.
 
+**Note:** DroneKit-SITL currently only supplies x86 binaries for Mac, Linux and Windows. You can't run it on ARM platforms like RaPi.
+
 ## Installing
 
 Install using pip (recommended):

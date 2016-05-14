@@ -112,6 +112,15 @@ sitl.poll() # returns None or return code
 sitl.stop() # terminates SITL
 ```
 
+A simpler (but less flexible) interface is also available:
+```
+import dronekit_sitl
+sitl = dronekit_sitl.start_default() # basic ArduCopter sim
+connection_string = sitl.connection_string()
+.
+.
+sitl.stop() # terminates SITL
+```
 
 ## License
 

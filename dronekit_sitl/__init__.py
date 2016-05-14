@@ -297,6 +297,26 @@ class SITL():
             if not out and not err and alive != None:
                 break
 
+    def connection_string(self):
+        '''returned string may be used to connect to simulated vehicle'''
+        return 'tcp:127.0.0.1:5760'
+
+def start_default(lat=None, lon=None):
+    '''start a SITL session using sensible defaults.  This should be the simplest way to start a sitl session'''
+    print("Starting copter simulator (SITL)")
+    sitl = SITL()
+    sitl.download('copter', '3.3', verbose=True)
+    if ((lat is not None and lon is None) or
+        (lat is None and lon is not None)):
+        print("Supply both lat and lon, or neither")
+        exit(1)
+    sitl_args = ['-I0', '--model', 'quad', ]
+    if lat is not None:
+        sitl_args.append('--home=%f,%f,584,353' % (lat,lon,))
+    sitl.launch(sitl_args, await_ready=True, restart=True)
+    return sitl
+
+
 def launch(system, version, args):
     return SITL(system, version, args)
 

@@ -139,6 +139,32 @@ def download(system, version, target, verbose=False):
 
 sitl_instance_count = 0
 
+class ArdupilotCapabilities():
+    def __init__(self, path):
+        # Load the binary for primitive feature detection.
+        elf = open(path, 'rb').read()
+
+        # pysim is required for earlier SITL builds
+        # lacking --home or --model params.
+        need_sim = not b'--home' in elf or not b'--model' in elf
+        self.using_sim = need_sim
+
+        if b'ardupilot/APMrover2' in elf:
+            self.model = 'rover'
+        elif b'ardupilot/ArduPlane' in elf:
+            self.model = 'plane'
+        else:
+            self.model = 'quad'
+
+
+        try:
+            helptext = subprocess.Popen([path, '--help'], stdout=subprocess.PIPE).communicate()[0]
+        except OSError as e:
+            print("Failed to run (%s)" % (path,))
+
+        self.has_defaults_path = "--defaults path" in helptext
+
+
 class SITL():
     def __init__(self, path=None, instance=None, defaults_filepath=None, ):
         global sitl_instance_count
@@ -189,31 +215,21 @@ class SITL():
             wd = tempfile.mkdtemp()
         self.wd = wd
 
-        # Load the binary for primitive feature detection.
-        elf = open(self.path, 'rb').read()
-
-        # pysim is required for earlier SITL builds
-        # lacking --home or --model params.
-        need_sim = not b'--home' in elf or not b'--model' in elf
-        self.using_sim = need_sim
+        caps = ArdupilotCapabilities(self.path)
+        self.using_sim = caps.using_sim # compatability
 
         # Defaults stabilizes SITL emulation.
         # https://github.com/dronekit/dronekit-sitl/issues/34
         if not any(x.startswith('--home') for x in args):
             args.append('--home=-35.363261,149.165230,584,353')
         if not any(x.startswith('--model') for x in args):
-            if b'ardupilot/APMrover2' in elf:
-                args.append('--model=rover')
-            elif b'ardupilot/ArduPlane' in elf:
-                args.append('--model=quad')
-            else:
-                args.append('--model=quad')
+            args.append('--model=' + caps.model)
 
         if not any(x.startswith('-I') for x in args):
             args.extend(['-I', str(self.instance)])
 
         # Run pysim
-        if need_sim:
+        if self.using_sim:
             import argparse
             parser = argparse.ArgumentParser(usage=argparse.SUPPRESS)
             parser.add_argument('-I')

@@ -140,7 +140,7 @@ def download(system, version, target, verbose=False):
 sitl_instance_count = 0
 
 class SITL():
-    def __init__(self, path=None, instance=None):
+    def __init__(self, path=None, instance=None, defaults_filepath=None, ):
         global sitl_instance_count
         if instance is None:
             self.instance = sitl_instance_count
@@ -154,6 +154,7 @@ class SITL():
             self.path = None
         self.p = None
         self.wd = None
+        self.defaults_filepath = defaults_filepath
 
     def download(self, system, version, target=None, verbose=False):
         if target == None:
@@ -169,7 +170,8 @@ class SITL():
 
         return download(system, version, target, verbose=verbose)
 
-    def launch(self, args, verbose=False, await_ready=False, restart=False, wd=None, use_saved_data=False):
+    def launch(self, initial_args, verbose=False, await_ready=False, restart=False, wd=None, use_saved_data=False):
+        args = initial_args[:]
         if not self.path:
             raise Exception('No path specified for SITL instance.')
         if not os.path.exists(self.path):
@@ -262,15 +264,27 @@ class SITL():
                 if verbose:
                     print('Pysim:', ' '.join((simargs)))
 
-        if verbose:
-            print('Execute:', ' '.join([self.path] + args))
+        # new versions of ardupilot allow us to specify a set of defaults:
+        if caps.has_defaults_path:
+            if self.defaults_filepath is not None:
+                args.extend(["--defaults", self.defaults_filepath])
+            if not use_saved_data:
+                args.append("-w")
+        else:
+            if self.defaults_filepath is not None:
+                raise ValueError("--defaults not supported by ardupilot binary")
 
-        # Copy default eeprom into this dir.
-        if not use_saved_data:
+        # the following is the "traditional" way of wiping parameters
+        # and using pre-canned parameters generated and stored on s3
+        if not use_saved_data and self.defaults_filepath is None:
+            # Copy default eeprom into this dir.
             try:
                 shutil.copy2(os.path.join(os.path.dirname(self.path), 'default_eeprom.bin'), os.path.join(wd, 'eeprom.bin'))
             except:
                 pass
+
+        if verbose:
+            print('Execute:', ' '.join([self.path] + args))
 
         # # Change CPU core affinity.
         # # TODO change affinity on osx/linux

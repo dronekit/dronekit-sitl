@@ -12,6 +12,7 @@ import json
 import tarfile
 import sys
 from six.moves.urllib.request import URLopener, Request, urlopen
+from six.moves.urllib.error import HTTPError
 import os
 import json
 import shutil
@@ -114,8 +115,12 @@ def download(system, version, target, verbose=False):
         try:
             testfile = URLopener()
             testfile.retrieve(sitl_file, sitl_target + '/sitl.tar.gz', check_complete)
-        except IOError as ioe:
-            if ioe.args[1] == 404:
+        except HTTPError as e:
+            if e.code == 404:
+                print('File Not Found: %s' % sitl_file)
+                sys.exit(1)
+        except IOError as e:
+            if e.args[1] == 404:
                 print('File Not Found: %s' % sitl_file)
                 sys.exit(1)
 

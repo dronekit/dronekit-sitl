@@ -144,6 +144,7 @@ class SITL():
         else:
             self.path = None
         self.p = None
+        self.wd = None
 
     def download(self, system, version, target=None, verbose=False):
         if target == None:
@@ -159,7 +160,7 @@ class SITL():
 
         return download(system, version, target, verbose=verbose)
 
-    def launch(self, args, verbose=False, await_ready=False, restart=False, wd=None):
+    def launch(self, args, verbose=False, await_ready=False, restart=False, wd=None, use_saved_data=False):
         if not self.path:
             raise Exception('No path specified for SITL instance.')
         if not os.path.exists(self.path):
@@ -175,6 +176,7 @@ class SITL():
 
         if not wd:
             wd = tempfile.mkdtemp()
+        self.wd = wd
 
         # Load the binary for primitive feature detection.
         elf = open(self.path, 'rb').read()
@@ -247,10 +249,11 @@ class SITL():
             print('Execute:', ' '.join([self.path] + args))
 
         # Copy default eeprom into this dir.
-        try:
-            shutil.copy2(os.path.join(os.path.dirname(self.path), 'default_eeprom.bin'), os.path.join(wd, 'eeprom.bin'))
-        except:
-            pass
+        if not use_saved_data:
+            try:
+                shutil.copy2(os.path.join(os.path.dirname(self.path), 'default_eeprom.bin'), os.path.join(wd, 'eeprom.bin'))
+            except:
+                pass
 
         # # Change CPU core affinity.
         # # TODO change affinity on osx/linux

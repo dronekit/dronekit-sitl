@@ -137,8 +137,17 @@ def download(system, version, target, verbose=False):
     if verbose:
         print('Ready to boot.')
 
+sitl_instance_count = 0
+
 class SITL():
-    def __init__(self, path=None):
+    def __init__(self, path=None, instance=None):
+        global sitl_instance_count
+        if instance is None:
+            self.instance = sitl_instance_count
+            sitl_instance_count += 1
+        else:
+            self.instance = instance
+
         if path:
             self.path = os.path.realpath(path)
         else:
@@ -197,6 +206,9 @@ class SITL():
                 args.append('--model=quad')
             else:
                 args.append('--model=quad')
+
+        if not any(x.startswith('-I') for x in args):
+            args.extend(['-I', str(self.instance)])
 
         # Run pysim
         if need_sim:
@@ -324,7 +336,11 @@ class SITL():
 
     def connection_string(self):
         '''returned string may be used to connect to simulated vehicle'''
-        return 'tcp:127.0.0.1:5760'
+        # these are magic numbers; ArduPilot listens on ports starting
+        # at 5760+10*(instance-number)
+        port = 5760
+        port += 10 * self.instance
+        return 'tcp:127.0.0.1:' + str(port)
 
 def start_default(lat=None, lon=None):
     '''start a SITL session using sensible defaults.  This should be the simplest way to start a sitl session'''
@@ -335,7 +351,7 @@ def start_default(lat=None, lon=None):
         (lat is None and lon is not None)):
         print("Supply both lat and lon, or neither")
         exit(1)
-    sitl_args = ['-I0', '--model', 'quad', ]
+    sitl_args = ['--model', 'quad', ]
     if lat is not None:
         sitl_args.append('--home=%f,%f,584,353' % (lat,lon,))
     sitl.launch(sitl_args, await_ready=True, restart=True)

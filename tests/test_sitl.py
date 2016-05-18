@@ -1,7 +1,10 @@
 from dronekit_sitl import SITL
+import dronekit
 from nose.tools import assert_equals,assert_is_not_none
+import time
 
 copter_args = ['-I0', '-S', '--model', 'quad', '--home=-35.363261,149.165230,584,353']
+
 
 def test_sitl():
     sitl = SITL()
@@ -18,16 +21,17 @@ def test_sitl():
     # Test "relaunch"
     sitl.launch(copter_args)
     try:
-    	sitl.launch(copter_args)
-    	assert False, 'SITL should fail to launch() again when running'
+        sitl.launch(copter_args)
+        assert False, 'SITL should fail to launch() again when running'
     except:
-    	pass
+        pass
     try:
-    	sitl.launch(copter_args, restart=True)
+        sitl.launch(copter_args, restart=True)
     except:
-    	assert False, 'SITL should succeed in launch() when restart=True'
+        assert False, 'SITL should succeed in launch() when restart=True'
 
     sitl.stop()
+
 
 def test_version_list():
     from dronekit_sitl import version_list
@@ -39,6 +43,35 @@ def test_version_list():
     models.sort()
     assert_equals(expected, models)
 
+
 def test_download():
     from dronekit_sitl import download
     download('copter','3.3', None)
+
+
+def test_preserve_eeprom():
+    # Start an SITL instance and change SYSID_THISMAV
+    print "test"
+    sitl = SITL()
+    sitl.download('copter', '3.3')
+    sitl.launch(copter_args, verbose=True, await_ready=True, use_saved_data=True)
+    vehicle = dronekit.connect("tcp:127.0.0.1:5760", wait_ready=True)
+    new_sysid = 10
+    print "Changing SYSID_THISMAV to {0}".format(new_sysid)
+    while vehicle.parameters["SYSID_THISMAV"] != new_sysid:
+        vehicle.parameters["SYSID_THISMAV"] = new_sysid
+        time.sleep(0.1)
+    print "Changed SYSID_THISMAV to {0}".format(new_sysid)
+    vehicle.close()
+    sitl.stop()
+
+    # Now see if it persisted
+    sitl = SITL()
+    sitl.download('copter', '3.3')
+    sitl.launch(copter_args, await_ready=True, use_saved_data=True)
+    vehicle = dronekit.connect("tcp:127.0.0.1:5760", wait_ready=True)
+    assert_equals(new_sysid, vehicle.parameters["SYSID_THISMAV"])
+
+    vehicle.close()
+    sitl.stop()
+

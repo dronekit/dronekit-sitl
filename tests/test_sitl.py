@@ -1,6 +1,7 @@
 from dronekit_sitl import SITL
 import dronekit
-from nose.tools import assert_equals,assert_is_not_none
+from nose.tools import assert_equals,assert_is_not_none,assert_true,assert_false
+import nose.tools
 import time
 import tempfile
 
@@ -68,10 +69,59 @@ def test_preserve_eeprom():
     vehicle.close()
     sitl.stop()
 
-    # Now see if it persisted
-    sitl.launch(copter_args, await_ready=True, use_saved_data=True, wd=working_dir)
+
+def test_can_arm():
+    sitl = SITL()
+    sitl.download('copter', '3.3')
+    sitl.launch(copter_args, verbose=True, await_ready=True)
     vehicle = dronekit.connect("tcp:127.0.0.1:5760", wait_ready=True)
-    assert_equals(new_sysid, vehicle.parameters["SYSID_THISMAV"])
+    # Wait for vehicle to be armable
+    timeout = time.time() + 10
+    while not vehicle.is_armable and time.time() < timeout:
+        time.sleep(0.35)
+    timed_out = time.time() >= timeout
+    if timed_out:
+        sitl.stop()
+    assert_false(timed_out, "Vehicle init timed out")
+
+    # Arm it
+    vehicle.mode = dronekit.VehicleMode("GUIDED")
+    vehicle.armed = True
+
+    # Confirm that it armed
+    timeout = time.time() + 10
+    while not vehicle.armed and time.time() < timeout:
+        time.sleep(0.35)
+    timed_out = time.time() >= timeout
     vehicle.close()
     sitl.stop()
+    assert_false(timed_out, "Vehicle arming timed out")
 
+
+# Same as previous test, except with use_saved_data=True
+def test_can_arm_saved_data():
+    sitl = SITL()
+    sitl.download('copter', '3.3')
+    sitl.launch(copter_args, verbose=True, await_ready=True, use_saved_data=True)
+    vehicle = dronekit.connect("tcp:127.0.0.1:5760", wait_ready=True)
+    # Wait for vehicle to be armable
+    timeout = time.time() + 10
+    while not vehicle.is_armable and time.time() < timeout:
+        time.sleep(0.35)
+    timed_out = time.time() >= timeout
+    if timed_out:
+        sitl.stop()
+    assert_false(timed_out, "Vehicle init timed out")
+
+    # Arm it
+    vehicle.mode = dronekit.VehicleMode("GUIDED")
+    vehicle.armed = True
+
+    # Confirm that it armed
+    timeout = time.time() + 10
+    while not vehicle.armed and time.time() < timeout:
+        time.sleep(0.35)
+    timed_out = time.time() >= timeout
+    vehicle.close()
+    sitl.stop()
+    assert_false(timed_out, "Vehicle arming timed out")

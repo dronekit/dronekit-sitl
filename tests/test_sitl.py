@@ -3,7 +3,7 @@ import dronekit
 from nose.tools import assert_equals,assert_is_not_none
 import time
 
-copter_args = ['-I0', '-S', '--model', 'quad', '--home=-35.363261,149.165230,584,353']
+copter_args = ['-S', '--model', 'quad', '--home=-35.363261,149.165230,584,353']
 
 
 def test_sitl():
@@ -55,21 +55,21 @@ def test_preserve_eeprom():
     sitl = SITL()
     sitl.download('copter', '3.3')
     sitl.launch(copter_args, verbose=True, await_ready=True, use_saved_data=True)
-    vehicle = dronekit.connect("tcp:127.0.0.1:5760", wait_ready=True)
+    connection_string = sitl.connection_string()
+    vehicle = dronekit.connect(connection_string, wait_ready=True)
     new_sysid = 10
     print "Changing SYSID_THISMAV to {0}".format(new_sysid)
     while vehicle.parameters["SYSID_THISMAV"] != new_sysid:
         vehicle.parameters["SYSID_THISMAV"] = new_sysid
         time.sleep(0.1)
     print "Changed SYSID_THISMAV to {0}".format(new_sysid)
-    vehicle.close()
+    time.sleep(5) # give parameters time to write
     sitl.stop()
+    vehicle.disconnect()
 
     # Now see if it persisted
-    sitl = SITL()
-    sitl.download('copter', '3.3')
     sitl.launch(copter_args, await_ready=True, use_saved_data=True)
-    vehicle = dronekit.connect("tcp:127.0.0.1:5760", wait_ready=True)
+    vehicle = dronekit.connect(connection_string, wait_ready=True, target_system=new_sysid)
     assert_equals(new_sysid, vehicle.parameters["SYSID_THISMAV"])
 
     vehicle.close()

@@ -173,7 +173,7 @@ def main_thread():
     return None # should not get to here!  Raise an exception instead?
 
 class SITL():
-    def __init__(self, path=None, instance=None, defaults_filepath=None, ):
+    def __init__(self, path=None, instance=None, defaults_filepath=None, gdb=False):
         global sitl_instance_count
         if instance is None:
             self.instance = sitl_instance_count
@@ -188,6 +188,7 @@ class SITL():
         self.p = None
         self.wd = None
         self.defaults_filepath = defaults_filepath
+        self.gdb = gdb
 
     def download(self, system, version, target=None, verbose=False):
         if target == None:
@@ -326,9 +327,6 @@ class SITL():
             except:
                 pass
 
-        if verbose:
-            print('Execute:', ' '.join([self.path] + args))
-
         # # Change CPU core affinity.
         # # TODO change affinity on osx/linux
         # if sys.platform == 'win32':
@@ -337,7 +335,18 @@ class SITL():
         # else:
         #     sitl = Popen(sitl_args, stdout=PIPE, stderr=PIPE)
 
-        p = Popen([self.path] + args, cwd=wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
+        popen_args = []
+        if self.gdb:
+            commands_file = "/tmp/gdb.tmp"
+            open(commands_file,"w").write("r\n")
+            popen_args.extend(["xterm", "-e", "gdb", "-q", "-x", commands_file, "--args"])
+        popen_args.append(self.path)
+        popen_args.extend(args)
+
+        if verbose:
+            print('Execute:', ' '.join(popen_args))
+
+        p = Popen(popen_args, cwd=wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
         self.p = p
 
         def cleanup():
@@ -370,6 +379,8 @@ class SITL():
 
     def block_until_ready(self, verbose=False):
         # Block until "Waiting for connection . . ."
+        if self.gdb:
+            return
         while self.poll() == None:
             line = self.stdout.readline(0.01)
             if line and verbose:

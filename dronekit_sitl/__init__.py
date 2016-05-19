@@ -237,9 +237,10 @@ class SITL():
                 raise ChildProcessError('SITL is already running in this process, please use .stop() to kill it')
             self.stop()
 
-        if not wd:
-            wd = tempfile.mkdtemp()
-        self.wd = wd
+        if wd is not None:
+            self.wd = wd
+        if self.wd is None or not use_saved_data:
+            self.wd = tempfile.mkdtemp()
 
         caps = ArdupilotCapabilities(self.path)
         self.using_sim = caps.using_sim # compatability
@@ -294,7 +295,7 @@ class SITL():
                 if res.gimbal:
                     simargs.append('--gimbal')
 
-                psim = Popen(simargs, cwd=wd, shell=sys.platform == 'win32')
+                psim = Popen(simargs, cwd=self.wd, shell=sys.platform == 'win32')
 
                 def cleanup_sim():
                     try:
@@ -321,7 +322,7 @@ class SITL():
         if not use_saved_data and self.defaults_filepath is None:
             # Copy default eeprom into this dir.
             try:
-                shutil.copy2(os.path.join(os.path.dirname(self.path), 'default_eeprom.bin'), os.path.join(wd, 'eeprom.bin'))
+                shutil.copy2(os.path.join(os.path.dirname(self.path), 'default_eeprom.bin'), os.path.join(self.wd, 'eeprom.bin'))
             except:
                 pass
 
@@ -344,18 +345,17 @@ class SITL():
         if verbose:
             print('Execute:', ' '.join(popen_args))
 
-        p = Popen(popen_args, cwd=wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
-        self.p = p
+        self.p = Popen(popen_args, cwd=self.wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
 
         def cleanup():
             try:
-                kill(p.pid)
+                kill(self.p.pid)
             except:
                 pass
         atexit.register(cleanup)
 
-        self.stdout = NonBlockingStreamReader(p.stdout)
-        self.stderr = NonBlockingStreamReader(p.stderr)
+        self.stdout = NonBlockingStreamReader(self.p.stdout)
+        self.stderr = NonBlockingStreamReader(self.p.stderr)
 
         if await_ready:
             self.block_until_ready(verbose=verbose)

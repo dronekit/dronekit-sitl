@@ -69,6 +69,13 @@ def test_preserve_eeprom():
     vehicle.close()
     sitl.stop()
 
+    # Now see if it persisted
+    sitl.launch(copter_args, await_ready=True, use_saved_data=True, wd=working_dir)
+    vehicle = dronekit.connect("tcp:127.0.0.1:5760", wait_ready=True)
+    assert_equals(new_sysid, vehicle.parameters["SYSID_THISMAV"])
+    vehicle.close()
+    sitl.stop()
+
 
 def test_can_arm():
     sitl = SITL()

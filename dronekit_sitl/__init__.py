@@ -21,6 +21,7 @@ import select
 import psutil
 import tempfile
 from subprocess import Popen, PIPE
+import threading
 from threading import Thread
 from six.moves.queue import Queue, Empty
 
@@ -164,6 +165,12 @@ class ArdupilotCapabilities():
         self.has_defaults_path = "--defaults path" in helptext
 
 
+def main_thread():
+    for thread in threading.enumerate():
+        if thread.name == "MainThread":
+            return thread
+    raise Exception("MainThread not found.  Can't happen")
+
 class SITL():
     def __init__(self, path=None, instance=None, defaults_filepath=None, ):
         global sitl_instance_count
@@ -194,6 +201,25 @@ class SITL():
         self.path = os.path.join(os.path.join(os.path.join(sitl_target, system + '-' + version), 'apm'))
 
         return download(system, version, target, verbose=verbose)
+
+    def emit_sitl_stdout(self, line):
+        sys.stdout.write("SITL-%d> " % (self.instance,))
+        sys.stdout.write(line.decode(sys.getdefaultencoding()) if six.PY3 else line)
+
+    def emit_sitl_stderr(self, line):
+        sys.stdout.write("SITL-%d.stderr> " % (self.instance,))
+        sys.stdout.write(line.decode(sys.getdefaultencoding()) if six.PY3 else line)
+
+    def _sitl_reader(self):
+        while not self.sitl_reader_should_quit:
+            line = self.stdout.readline(timeout=1)
+            if line is not None:
+                self.emit_sitl_stdout(line)
+            line = self.stderr.readline(timeout=1)
+            if line is not None:
+                self.emit_sitl_stderr(line)
+            if not main_thread().is_alive():
+                break
 
     def launch(self, initial_args, verbose=False, await_ready=False, restart=False, wd=None, use_saved_data=False):
         args = initial_args[:]
@@ -325,6 +351,13 @@ class SITL():
         if await_ready:
             self.block_until_ready(verbose=verbose)
 
+        self.sitl_reader = None
+        if verbose:
+            # set up a reader to spit output from SITL out
+            self.sitl_reader_should_quit = False
+            self.sitl_reader = Thread(target = self._sitl_reader, args = ())
+            self.sitl_reader.start()
+
     def poll(self):
         return self.p.poll()
 
@@ -338,17 +371,22 @@ class SITL():
         while self.poll() == None:
             line = self.stdout.readline(0.01)
             if line and verbose:
-                sys.stdout.write(line.decode(sys.getdefaultencoding()) if six.PY3 else line)
+                self.emit_sitl_stdout(line)
             if line and b'Waiting for connection' in line:
                 break
 
             line = self.stderr.readline(0.01)
             if line and verbose:
-                sys.stderr.write(line.decode(sys.getdefaultencoding()) if six.PY3 else line)
+                self.emit_sitl_stderr(line)
 
         return self.poll()
 
     def complete(self, verbose=False):
+        # tell the sitl reader to stop slurping the data we're after
+        if self.sitl_reader is not None:
+            self.sitl_reader_should_quit = True
+            self.sitl_reader.join()
+
         while True:
             alive = self.poll()
 

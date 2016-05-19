@@ -12,6 +12,7 @@ import json
 import tarfile
 import sys
 from six.moves.urllib.request import URLopener, Request, urlopen
+from six.moves.urllib.error import HTTPError
 import os
 import json
 import shutil
@@ -107,18 +108,34 @@ def download(system, version, target, verbose=False):
         if not os.path.isdir(sitl_target):
             os.makedirs(sitl_target)
 
-        testfile = URLopener()
-        testfile.retrieve(sitl_file, sitl_target + '/sitl.tar.gz')
+        def check_complete(count, block_size, total_size):
+            if verbose and total_size != -1 and (count * block_size) >= total_size:
+                print('Download Complete.')
 
+        try:
+            testfile = URLopener()
+            testfile.retrieve(sitl_file, sitl_target + '/sitl.tar.gz', check_complete)
+        except HTTPError as e:
+            if e.code == 404:
+                print('File Not Found: %s' % sitl_file)
+                sys.exit(1)
+        except IOError as e:
+            if e.args[1] == 404:
+                print('File Not Found: %s' % sitl_file)
+                sys.exit(1)
+
+        # TODO: cleanup sitl.tar.gz
         tar = tarfile.open(sitl_target + '/sitl.tar.gz')
         tar.extractall(path=sitl_target + '/' + system + '-' + version)
         tar.close()
 
         if verbose:
-            print('Extracted.')
+            print("Payload Extracted.")
     else:
         if verbose:
-            print("SITL already Downloaded.")
+            print("SITL already Downloaded and Extracted.")
+    if verbose:
+        print('Ready to boot.')
 
 class SITL():
     def __init__(self, path=None):
@@ -300,6 +317,26 @@ class SITL():
             if not out and not err and alive != None:
                 break
 
+    def connection_string(self):
+        '''returned string may be used to connect to simulated vehicle'''
+        return 'tcp:127.0.0.1:5760'
+
+def start_default(lat=None, lon=None):
+    '''start a SITL session using sensible defaults.  This should be the simplest way to start a sitl session'''
+    print("Starting copter simulator (SITL)")
+    sitl = SITL()
+    sitl.download('copter', '3.3', verbose=True)
+    if ((lat is not None and lon is None) or
+        (lat is None and lon is not None)):
+        print("Supply both lat and lon, or neither")
+        exit(1)
+    sitl_args = ['-I0', '--model', 'quad', ]
+    if lat is not None:
+        sitl_args.append('--home=%f,%f,584,353' % (lat,lon,))
+    sitl.launch(sitl_args, await_ready=True, restart=True)
+    return sitl
+
+
 def launch(system, version, args):
     return SITL(system, version, args)
 
@@ -377,10 +414,20 @@ def main(args=None):
         print('--local no longer needed. Specify an absolute or relative file path.')
         sys.exit(1)
 
+    if len(args) > 0 and args[0] == 'download':
+        capture = re.match(r'([a-z]*)(\-)(([0-9]{1,}|(\.))*)', args[1])
+        system = capture.group(1)
+        version = capture.group(3)
+        print('os: %s, apm: %s, release: %s' % (target, system, version))
+        sitl = SITL()
+        sitl.download(system, version, target=target, verbose=True)
+        sys.exit(1)
+
     if len(args) < 1 or not re.match(r'^(copter|plane|solo|rover)(-v?.+)?|^[./]|:', args[0]) and not local:
         print('Please specify one of:', file=sys.stderr)
         print('  dronekit-sitl --list', file=sys.stderr)
         print('  dronekit-sitl --reset', file=sys.stderr)
+        print('  dronekit-sitl download <(copter|plane|rover|solo)(-version)>', file=sys.stderr)
         print('  dronekit-sitl <copter(-version)> [args...]', file=sys.stderr)
         print('  dronekit-sitl <plane(-version)> [args...]', file=sys.stderr)
         print('  dronekit-sitl <rover(-version)> [args...]', file=sys.stderr)

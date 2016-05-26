@@ -76,8 +76,7 @@ mkdir -p build/test
 mkdir -p build/out
 mkdir -p publish
 cd build
-wget -qO ardupilot.tar.gz https://github.com/tcr3dr/ardupilot-releases/archive/builder-$TARGET_LABEL-$TARGET_VERSION.tar.gz
-tar -xf ardupilot.tar.gz --strip-components=1 -C ardupilot
+git clone https://github.com/dronekit/ardupilot-releases -b builder-$TARGET_LABEL-$TARGET_VERSION ardupilot --depth 10
 cd ardupilot/$TARGET_ARDU
 
 buildit () {

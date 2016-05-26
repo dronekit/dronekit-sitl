@@ -12,6 +12,9 @@
     },
     "2.0.18": {
       "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-solo-2.0.18.tar.gz"
+    },
+    "2.0.20": {
+      "source": "https://github.com/tcr3dr/ardupilot-releases/archive/builder-solo-2.0.20.tar.gz"
     }
   },
   "plane": {

@@ -112,7 +112,7 @@ fi
 		source ./env/bin/activate
 	fi
 	pip install ../ -U --no-cache-dir
-	yes || pip uninstall pymavlink
+	yes | pip uninstall pymavlink
 	pip install "pymavlink<2.0"
 
 	python eepromgen.py

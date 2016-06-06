@@ -244,6 +244,12 @@ class SITL():
         if self.wd is None or not use_saved_data:
             self.wd = tempfile.mkdtemp()
 
+        if use_saved_data:
+            # make sure there's an eeprom.bin, at least!
+            eeprom_path = os.path.join(self.wd, "eeprom.bin")
+            if not os.path.exists(eeprom_path):
+                raise Exception('Told to use saved data, but (%s) does not exist' % (eeprom_path,))
+
         caps = ArdupilotCapabilities(self.path)
         self.using_sim = caps.using_sim # compatability
 

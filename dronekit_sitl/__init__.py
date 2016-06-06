@@ -180,7 +180,7 @@ class SITL():
         else:
             self.instance = instance
 
-        if path:
+        if path is not None:
             self.path = os.path.realpath(path)
         else:
             self.path = None

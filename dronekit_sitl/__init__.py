@@ -222,7 +222,7 @@ class SITL():
             if not main_thread().is_alive():
                 break
 
-    def launch(self, initial_args, verbose=False, await_ready=False, restart=False, wd=None, use_saved_data=False):
+    def launch(self, initial_args, verbose=False, await_ready=False, restart=False, wd=None, use_saved_data=False, speedup=None):
         args = initial_args[:]
         if not self.path:
             raise Exception('No path specified for SITL instance.')
@@ -254,6 +254,9 @@ class SITL():
 
         if not any(x.startswith('-I') for x in args):
             args.extend(['-I', str(self.instance)])
+
+        if speedup is not None:
+            args.extend(['--speedup', str(speedup)])
 
         # Run pysim
         if self.using_sim:

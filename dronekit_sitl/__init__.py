@@ -173,7 +173,7 @@ def main_thread():
     return None # should not get to here!  Raise an exception instead?
 
 class SITL():
-    def __init__(self, path=None, instance=None, defaults_filepath=None, gdb=False):
+    def __init__(self, path=None, instance=None, defaults_filepath=None, gdb=False, valgrind=False):
         global sitl_instance_count
         if instance is None:
             self.instance = sitl_instance_count
@@ -189,6 +189,7 @@ class SITL():
         self.wd = None
         self.defaults_filepath = defaults_filepath
         self.gdb = gdb
+        self.valgrind = valgrind
 
     def download(self, system, version, target=None, verbose=False):
         if target == None:
@@ -350,6 +351,8 @@ class SITL():
             commands_file = "/tmp/gdb.tmp"
             open(commands_file,"w").write("r\n")
             popen_args.extend(["xterm", "-e", "gdb", "-q", "-x", commands_file, "--args"])
+        if self.valgrind:
+            popen_args.extend(["xterm", "-e", "valgrind" ])
         popen_args.append(self.path)
         popen_args.extend(args)
 
@@ -390,6 +393,9 @@ class SITL():
     def block_until_ready(self, verbose=False):
         # Block until "Waiting for connection . . ."
         if self.gdb:
+            return
+        if self.valgrind:
+            time.sleep(5)
             return
         while self.poll() == None:
             line = self.stdout.readline(0.01)

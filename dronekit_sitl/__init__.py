@@ -172,7 +172,7 @@ def main_thread():
     raise Exception("MainThread not found.  Can't happen")
 
 class SITL():
-    def __init__(self, path=None, instance=None, defaults_filepath=None, gdb=False, valgrind=False):
+    def __init__(self, path=None, instance=None, defaults_filepath=None, gdb=False, gdb_breakpoints=[], valgrind=False):
         global sitl_instance_count
         if instance is None:
             self.instance = sitl_instance_count
@@ -188,6 +188,7 @@ class SITL():
         self.wd = None
         self.defaults_filepath = defaults_filepath
         self.gdb = gdb
+        self.gdb_breakpoints = gdb_breakpoints
         self.valgrind = valgrind
 
     def download(self, system, version, target=None, verbose=False):
@@ -347,7 +348,10 @@ class SITL():
         popen_args = []
         if self.gdb:
             commands_file = "/tmp/gdb.tmp"
-            open(commands_file,"w").write("r\n")
+            commands_fd = open(commands_file,"w")
+            for breakpoint in self.gdb_breakpoints:
+                commands_fd.write("b %s\n" % breakpoint)
+            commands_fd.write("r\n")
             popen_args.extend(["xterm", "-e", "gdb", "-q", "-x", commands_file, "--args"])
         if self.valgrind:
             popen_args.extend(["xterm", "-e", "valgrind" ])

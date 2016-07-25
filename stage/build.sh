@@ -113,7 +113,7 @@ fi
 	fi
 	pip install ../ -U --no-cache-dir
 	yes | pip uninstall pymavlink
-	pip install "pymavlink<2.0"
+	pip install "pymavlink"
 
 	python eepromgen.py
 	cp $STARTDIR/build/test/eeprom.bin $STARTDIR/build/out/default_eeprom.bin

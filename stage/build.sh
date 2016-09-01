@@ -82,7 +82,7 @@ cd ardupilot/$TARGET_ARDU
 buildit () {
   make clean BUILDROOT=$STAGING || true
   make configure SKETCHBOOK=$(pwd)/.. BUILDROOT=$STAGING || true
-  make sitl SKETCHBOOK=$(pwd)/.. BUILDROOT=$STAGING -j64 $MAKEARGS
+  make sitl-mount SKETCHBOOK=$(pwd)/.. BUILDROOT=$STAGING -j64 $MAKEARGS
 }
 
 # Thrice is nice. Works around build bugs in ArduCopter 3.2.x

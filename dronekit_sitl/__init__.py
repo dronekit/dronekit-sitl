@@ -207,6 +207,7 @@ class SITL():
             parser.add_argument('--rate')
             parser.add_argument('--model')
             parser.add_argument('-C', action='store_true')
+            parser.add_argument('--gimbal', action='store_true')
             def noop(*args, **kwargs):
                 pass
 
@@ -233,6 +234,10 @@ class SITL():
                 simargs = [sys.executable, os.path.join(os.path.dirname(__file__), 'pysim/sim_wrapper.py'),
                            '--simin=127.0.0.1:5502', '--simout=127.0.0.1:5501', '--fgout=127.0.0.1:5503',
                            '--home='+res.home, '--frame='+res.model]
+
+                if res.gimbal:
+                    simargs.append('--gimbal')
+
                 psim = Popen(simargs, cwd=wd, shell=sys.platform == 'win32')
 
                 def cleanup_sim():

@@ -224,7 +224,6 @@ class SITL():
             if not main_thread().is_alive():
                 break
 
-
     def launch(self, initial_args, verbose=False, await_ready=False, restart=False, wd=None, use_saved_data=False, speedup=None):
         args = initial_args[:]
         if not self.path:

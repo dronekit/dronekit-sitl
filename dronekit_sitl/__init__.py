@@ -140,7 +140,7 @@ def download(system, version, target, verbose=False):
 
 sitl_instance_count = 0
 
-class ArdupilotCapabilities():
+class ArdupilotCapabilities(Capabilities):
     def __init__(self, path):
         # Load the binary for primitive feature detection.
         elf = open(path, 'rb').read()
@@ -156,7 +156,6 @@ class ArdupilotCapabilities():
             self.model = 'plane'
         else:
             self.model = 'quad'
-
 
         try:
             helptext = subprocess.Popen([path, '--help'], stdout=subprocess.PIPE).communicate()[0]

@@ -169,7 +169,7 @@ def main_thread():
     for thread in threading.enumerate():
         if thread.name == "MainThread":
             return thread
-    return None # should not get to here!  Raise an exception instead?
+    raise Exception("MainThread not found.  Can't happen")
 
 class SITL():
     def __init__(self, path=None, instance=None, defaults_filepath=None, gdb=False, gdb_breakpoints=[], valgrind=False):

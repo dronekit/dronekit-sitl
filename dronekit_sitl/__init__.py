@@ -433,6 +433,8 @@ class SITL():
 
     def connection_string(self):
         '''returned string may be used to connect to simulated vehicle'''
+        # these are magic numbers; ArduPilot listens on ports starting
+        # at 5760+10*(instance-number)
         port = 5760
         port += 10 * self.instance
         return 'tcp:127.0.0.1:' + str(port)

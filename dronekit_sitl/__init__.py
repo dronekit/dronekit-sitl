@@ -140,7 +140,7 @@ def download(system, version, target, verbose=False):
 
 sitl_instance_count = 0
 
-class ArdupilotCapabilities(Capabilities):
+class ArdupilotCapabilities():
     def __init__(self, path):
         # Load the binary for primitive feature detection.
         elf = open(path, 'rb').read()

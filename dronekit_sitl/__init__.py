@@ -361,8 +361,7 @@ class SITL():
         if verbose:
             print('Execute:', ' '.join(popen_args))
 
-        p = Popen(popen_args, cwd=self.wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
-        self.p = p
+        self.p = Popen(popen_args, cwd=self.wd, shell=sys.platform == 'win32', stdout=PIPE, stderr=PIPE)
 
         def cleanup():
             try:

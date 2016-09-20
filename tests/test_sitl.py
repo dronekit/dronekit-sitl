@@ -5,7 +5,6 @@ import time
 
 copter_args = ['-S', '--model', 'quad', '--home=-35.363261,149.165230,584,353']
 
-
 def test_sitl():
     sitl = SITL()
     sitl.download('copter', '3.3')
@@ -32,7 +31,6 @@ def test_sitl():
 
     sitl.stop()
 
-
 def test_version_list():
     from dronekit_sitl import version_list
     versions = version_list()
@@ -43,11 +41,9 @@ def test_version_list():
     models.sort()
     assert_equals(expected, models)
 
-
 def test_download():
     from dronekit_sitl import download
     download('copter','3.3', None)
-
 
 def test_preserve_eeprom():
     # Start an SITL instance and change COMPASS_USE

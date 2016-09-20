@@ -365,13 +365,13 @@ class SITL():
 
         def cleanup():
             try:
-                kill(p.pid)
+                kill(self.p.pid)
             except:
                 pass
         atexit.register(cleanup)
 
-        self.stdout = NonBlockingStreamReader(p.stdout)
-        self.stderr = NonBlockingStreamReader(p.stderr)
+        self.stdout = NonBlockingStreamReader(self.p.stdout)
+        self.stderr = NonBlockingStreamReader(self.p.stderr)
 
         if await_ready:
             self.block_until_ready(verbose=verbose)

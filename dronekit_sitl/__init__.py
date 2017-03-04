@@ -440,8 +440,18 @@ class SITL():
 def start_default(lat=None, lon=None):
     '''start a SITL session using sensible defaults.  This should be the simplest way to start a sitl session'''
     print("Starting copter simulator (SITL)")
-    sitl = SITL()
-    sitl.download('copter', '3.3', verbose=True)
+    args = {}
+    binary = os.getenv("SITL_BINARY")
+    do_download = True
+    if binary is not None:
+        do_download = False
+        args["path"] = binary
+        defaults = os.getenv("SITL_DEFAULTS_FILEPATH")
+        if defaults is not None:
+            args["defaults_filepath"] = defaults
+    sitl = SITL(**args)
+    if do_download:
+        sitl.download('copter', '3.3', verbose=True)
     if ((lat is not None and lon is None) or
         (lat is None and lon is not None)):
         print("Supply both lat and lon, or neither")

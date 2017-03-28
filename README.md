@@ -8,7 +8,7 @@ SITL Runner for DroneKit.
 
 ## Overview
 
-The ArduPilot [SITL (Software In The Loop) simulator](http://dev.ardupilot.com/wiki/simulation-2/sitl-simulator-software-in-the-loop/) allows you to simulate an ArduPilot based autopilot and communicate with it using MAVLink over the local IP network. 
+The ArduPilot [SITL (Software In The Loop) simulator](http://ardupilot.org/dev/docs/sitl-simulator-software-in-the-loop.html) allows you to simulate an ArduPilot based autopilot and communicate with it using MAVLink over the local IP network. 
 
 DroneKit-SITL is the fastest and easiest way to run SITL on Windows, Linux, or MAC OSX. It is installed from Python’s pip tool on all platforms, and provides a few simple commands to run pre-built vehicle binaries that are appropriate for the host operating system (downloading them if needed). You can even use it to run binaries you've build locally.
 

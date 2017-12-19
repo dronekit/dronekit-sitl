@@ -157,10 +157,8 @@ class ArdupilotCapabilities():
         else:
             self.model = 'quad'
 
-        try:
-            helptext = subprocess.Popen([path, '--help'], stdout=subprocess.PIPE).communicate()[0]
-        except OSError as e:
-            print("Failed to run (%s)" % (path,))
+        process = subprocess.Popen([path, '--help'], stdout=subprocess.PIPE)
+        helptext = process.communicate()[0]
 
         self.has_defaults_path = "--defaults path" in helptext
 

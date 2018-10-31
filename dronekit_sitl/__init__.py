@@ -158,7 +158,7 @@ class ArdupilotCapabilities():
             self.model = 'quad'
 
         process = subprocess.Popen([path, '--help'], stdout=subprocess.PIPE)
-        helptext = process.communicate()[0]
+        helptext = str(process.communicate()[0])
 
         self.has_defaults_path = "--defaults path" in helptext
 

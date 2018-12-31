@@ -1,0 +1,49 @@
+# CircleCI 2.0 configuration file for dronekit_sitl
+
+common: &commonsteps
+  steps:
+    - checkout
+
+    - run:
+        name: Install
+        command: |
+          virtualenv venv
+          source venv/bin/activate
+          pip install -U pip setuptools wheel
+          pip install -e .
+          pip install nose
+
+    - run:
+        name: Run tests
+        command: |
+          source venv/bin/activate
+          dronekit-sitl --list
+          nosetests tests
+
+# Jobs definition
+version: 2
+jobs:
+  python2.7:
+    docker:
+      - image: circleci/python:2.7-stretch
+    <<: *commonsteps
+
+  python3.6:
+    docker:
+      - image: circleci/python:3.6-stretch
+    <<: *commonsteps
+
+  python3.7:
+    docker:
+      - image: circleci/python:3.7-stretch
+    <<: *commonsteps
+
+# Workflow definition
+# Python 3 tests are disabled because the current PyPI version of DroneKit does not support Python 3
+workflows:
+  version: 2
+  build_test_deploy:
+    jobs:
+      - python2.7
+      #- python3.6
+      #- python3.7

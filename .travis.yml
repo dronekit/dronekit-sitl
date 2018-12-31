@@ -1,17 +1,25 @@
-env:
-  global: []
+language: python
+
+# Python 3 tests are disabled because the current PyPI version of DroneKit does not support Python 3
+python:
+  - 2.7
+  #- 3.5
+  #- 3.6
+
 
 install:
-  - 'sudo python setup.py install'
-  - 'sudo pip install nose'
+  - pip install -U pip setuptools wheel
+  - pip install -e .
+  - pip install nose
 script:
-  - '( cd /; dronekit-sitl --list; )'
-  - 'nosetests tests'
+  - dronekit-sitl --list
+  - nosetests tests
 
 git:
   depth: 10
-language: objective-c
+
 notifications:
   email: false
+
 matrix:
   fast_finish: true

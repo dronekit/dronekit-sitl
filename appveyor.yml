@@ -1,20 +1,25 @@
+# Python 3 tests are disabled because the current PyPI version of DroneKit does not support Python 3
 environment:
-  global: {}
+  matrix:
+    - PYTHON: "C:\\Python27"
+      PYTHON_VERSION: "2.7"
+    #- PYTHON: "C:\\Python37"
+    #  PYTHON_VERSION: "3.6"
+    #- PYTHON: "C:\\Python37"
+    #  PYTHON_VERSION: "3.7"
+
+init:
+  - cmd: "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 
 install:
-  - cmd: 'SET PATH=%PYTHON%;c:\\Python27\\Scripts;%PATH%'
-  - cmd: 'python -m pip install pip'
-  - cmd: 'python setup.py install'
+  - cmd: 'python -m pip install -U pip wheel setuptools'
+  - cmd: 'pip install -e .'
   - cmd: 'pip install nose'
 
-build_script:
+build: 'off'
+
+test_script:
   - cmd: 'setlocal & cd c:\\ & dronekit-sitl --list & endlocal'
   - cmd: 'nosetests tests'
 
 clone_depth: 10
-cache:
-  - '%CYG_CACHE%'
-test: 'off'
-branches:
-  only:
-    - master

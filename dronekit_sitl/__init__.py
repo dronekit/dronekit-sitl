@@ -19,6 +19,7 @@ import shutil
 import atexit
 import select
 import psutil
+import platform
 import tempfile
 from subprocess import Popen, PIPE
 import threading
@@ -27,6 +28,7 @@ from six.moves.queue import Queue, Empty
 
 
 sitl_host = 'http://dronekit-assets.s3.amazonaws.com/sitl'
+ardupilot_sitl_host = 'http://firmware.ardupilot.org'
 sitl_target = os.path.normpath(os.path.expanduser('~/.dronekit/sitl'))
 
 def kill(proc_pid):
@@ -78,19 +80,101 @@ class NonBlockingStreamReader:
 class UnexpectedEndOfStream(Exception):
     pass
 
+def use_new_sitl_binaries():
+    (system, node, release, version, machine, processor) = platform.uname()
+    if system == "Linux" and machine == "x86_64":
+        return True
+    return False
+
 def version_list():
+    if use_new_sitl_binaries():
+        return version_list_new()
+    # FIXME: add arm here
+    return version_list_old()
+
+def version_list_old():
     sitl_list = '{}/versions.json'.format(sitl_host)
 
     req = Request(sitl_list, headers={'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'})
+
     raw = urlopen(req).read()
 
     if six.PY3:
         raw = raw.decode('utf-8')
 
     versions = json.loads(raw)
+#    print("versions: %s" % versions)
     return versions
 
+def manifest_path():
+    return os.path.join(sitl_target, "manifest.json")
+
+def version_list_new_manifest(freshen=False):
+    mpath = manifest_path()
+    if not freshen:
+        if os.path.exists(mpath):
+            if time.time() - os.path.getmtime(mpath) < 86400:
+                with open(mpath) as fd:
+                    print("returning cached manifest")
+                    data = fd.read()
+                    j = json.loads(data)
+                    return j
+
+    sitl_list = '{}/manifest.json'.format(sitl_host)
+
+    req = Request(sitl_list, headers={
+        'Accept':'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    })
+    raw = urlopen(req).read()
+
+    if six.PY3:
+        raw = raw.decode('utf-8')
+
+    ret = json.loads(raw) # ensure parsable before storing
+
+    with open(mpath, 'w') as fd:
+        print("writing cached manifest")
+        return fd.write(raw)
+
+    return ret
+
+def version_list_new(freshen=False):
+    json = version_list_new_manifest(freshen=freshen)
+    # form up old-style json from manifest file
+    (system, node, release, version, machine, processor) = platform.uname()
+    if system == "Linux" and machine == "x86_64":
+        required_platform = "SITL_x86_64_linux_gnu"
+    else:
+        raise ValueError("Failed to determine required platform")
+
+    ret = {}
+    for f in json["firmware"]:
+        if f["platform"] != required_platform:
+            continue
+        print("f = %s" % str(f))
+        v = f["vehicletype"].lower()
+        if f["mav-type"] == "HELICOPTER":
+            v = "helicopter"
+        if v not in ret:
+            ret[v] = {}
+        ver = "%s-%s" % (f["mav-firmware-version"], f["mav-firmware-version-type"])
+        if ver in ret[v]:
+            raise ValueError("Already have a version %s for %s: (%s), this is (%s)" % (ver, v, ret[v][ver], f))
+        ret[v][ver] = f
+
+    return ret
+
+
 def download(system, version, target, verbose=False):
+    if use_new_sitl_binaries():
+        download_new(system, version, target, verbose=verbose)
+    download_old(system, version, target, verbose=verbose)
+
+def download_new(system, version, target, verbose=False):
+    print("new download")
+    sys.exit(1)
+
+def download_old(system, version, target, verbose=False):
     sitl_file = "{}/{}/sitl-{}-{}-{}.tar.gz".format(sitl_host, system, target, system, version)
 
     # Delete old directories from legacy SITL.
@@ -481,8 +565,8 @@ def reset():
         pass
     print('SITL directory cleared.')
 
-def main(args=None):
-    if args == None:
+def main(arg):
+    if True:
         args = sys.argv[1:]
 
         if sys.platform == 'win32':
@@ -606,3 +690,7 @@ def main(args=None):
             sys.exit(code)
     except KeyboardInterrupt:
         pass
+
+if __name__ == '__main__':
+    main(None)
+

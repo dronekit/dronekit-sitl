@@ -151,9 +151,9 @@ if __name__ == "__main__":
     yrate = r.yaw_rate(steer, speed)
     yaccel = r.lat_accel(steer, speed)
     yaccel2 = r.lat_accel2(steer, speed)
-    print yaccel, yaccel2
+    print("%f %f" % (yaccel, yaccel2))
     sangle = r.steering_angle(yaccel, speed)
-    print steer, sangle
+    print("%f %f" % (steer, sangle))
 
     yrate2 = degrees(yaccel / speed)
     t = 360.0 / yrate2
@@ -161,4 +161,4 @@ if __name__ == "__main__":
     d2 = c / pi
     steer2 = degrees(asin(r.wheelbase / (d2 - (r.wheeltrack/2))))
     
-    print steer, steer2
+    print("%f %f" % (steer, steer2))

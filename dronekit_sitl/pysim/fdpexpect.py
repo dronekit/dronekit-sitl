@@ -33,7 +33,7 @@ class fdspawn (spawn):
         try: # make sure fd is a valid file descriptor
             os.fstat(fd)
         except OSError:
-            raise ExceptionPexpect, 'The fd argument is not a valid file descriptor.'
+            raise ExceptionPexpect('The fd argument is not a valid file descriptor.')
 
         self.args = None
         self.command = None
